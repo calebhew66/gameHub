@@ -2578,7 +2578,6 @@
   
     }
     window.testCheckersWin = async function (mode) {
-
       difficulty = mode;
       winRecorded = false;
     
@@ -2593,6 +2592,6 @@
       );
     
       await recordCheckersWin();
-    
     };
-  })();
+    
+    })();
