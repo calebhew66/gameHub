@@ -569,25 +569,14 @@ function getBestMove() {
     // 1. BOT CAN WIN
     // ========================================
 
-    for (
-        let i = 0;
-        i < 9;
-        i++
-    ) {
+    for (let i = 0; i < 9; i++) {
 
         if (board[i] === "") {
 
             board[i] = BOT;
 
-            if (
-                checkWinner(
-                    board,
-                    BOT
-                )
-            ) {
-
+            if (checkWinner(board, BOT)) {
                 board[i] = "";
-
                 return i;
             }
 
@@ -600,25 +589,14 @@ function getBestMove() {
     // 2. BLOCK PLAYER
     // ========================================
 
-    for (
-        let i = 0;
-        i < 9;
-        i++
-    ) {
+    for (let i = 0; i < 9; i++) {
 
         if (board[i] === "") {
 
             board[i] = PLAYER;
 
-            if (
-                checkWinner(
-                    board,
-                    PLAYER
-                )
-            ) {
-
+            if (checkWinner(board, PLAYER)) {
                 board[i] = "";
-
                 return i;
             }
 
@@ -628,184 +606,46 @@ function getBestMove() {
 
 
     // ========================================
-    // 3. FORK PREVENTION
-    //
-    // If the player has opposite corners,
-    // taking the center can allow a fork.
-    //
-    // Example:
-    //
-    // X . .
-    // . O .
-    // . . X
-    //
-    // Don't blindly choose another corner.
-    // Choose a random available edge instead.
+    // 3. CHECK IF PLAYER HAS A CORNER
     // ========================================
 
-    const oppositeCornerPairs = [
-        [0, 8],
-        [2, 6]
-    ];
+    const corners = [0, 2, 6, 8];
 
-    const playerHasOppositeCorners =
-        oppositeCornerPairs.some(
-            ([a, b]) =>
-                board[a] === PLAYER &&
-                board[b] === PLAYER
-        );
+    const playerHasCorner = corners.some(
+        (index) => board[index] === PLAYER
+    );
 
+
+    // ========================================
+    // 4. CENTER
+    // ========================================
+
+    // Only automatically take center if the player
+    // does NOT have a corner.
 
     if (
-        playerHasOppositeCorners &&
-        board[4] === BOT
+        board[4] === "" &&
+        !playerHasCorner
     ) {
-
-        const edges = [
-            1,
-            3,
-            5,
-            7
-        ];
-
-
-        const availableEdges =
-            edges.filter(
-                (index) =>
-                    board[index] === ""
-            );
-
-
-        if (
-            availableEdges.length > 0
-        ) {
-
-            return availableEdges[
-                Math.floor(
-                    Math.random() *
-                    availableEdges.length
-                )
-            ];
-        }
-    }
-
-
-    // ========================================
-    // 4. IF PLAYER HAS A CORNER AND CENTER
-    // IS EMPTY, DON'T ALWAYS FORCE CENTER
-    // ========================================
-
-    const playerHasCorner =
-        [0, 2, 6, 8].some(
-            (index) =>
-                board[index] === PLAYER
-        );
-
-
-    if (
-        playerHasCorner &&
-        board[4] === ""
-    ) {
-
-        // Usually center is still a good move,
-        // but randomize between center and edges
-        // so the bot isn't completely predictable.
-
-        const safeChoices = [
-            4,
-            1,
-            3,
-            5,
-            7
-        ].filter(
-            (index) =>
-                board[index] === ""
-        );
-
-
-        if (
-            safeChoices.length > 0
-        ) {
-
-            return safeChoices[
-                Math.floor(
-                    Math.random() *
-                    safeChoices.length
-                )
-            ];
-        }
-    }
-
-
-    // ========================================
-    // 5. CENTER
-    // ========================================
-
-    if (
-        board[4] === ""
-    ) {
-
         return 4;
     }
 
 
     // ========================================
-    // 6. RANDOM CORNER
-    // ========================================
-
-    const corners = [
-        0,
-        2,
-        6,
-        8
-    ];
-
-
-    const availableCorners =
-        corners.filter(
-            (index) =>
-                board[index] === ""
-        );
-
-
-    if (
-        availableCorners.length > 0
-    ) {
-
-        return availableCorners[
-            Math.floor(
-                Math.random() *
-                availableCorners.length
-            )
-        ];
-    }
-
-
-    // ========================================
-    // 7. RANDOM AVAILABLE SPACE
+    // 5. RANDOM AVAILABLE MOVE
     // ========================================
 
     const availableSpaces = [];
 
+    for (let i = 0; i < 9; i++) {
 
-    for (
-        let i = 0;
-        i < 9;
-        i++
-    ) {
-
-        if (
-            board[i] === ""
-        ) {
-
+        if (board[i] === "") {
             availableSpaces.push(i);
         }
     }
 
 
-    if (
-        availableSpaces.length > 0
-    ) {
+    if (availableSpaces.length > 0) {
 
         return availableSpaces[
             Math.floor(
@@ -818,7 +658,6 @@ function getBestMove() {
 
     return -1;
 }
-
 
 function checkWinner(
     currentBoard,
