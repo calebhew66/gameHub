@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="description"
+    content="A collection of browser games."
+  />
+
+  <title>Game Hub</title>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+  <!-- ===== Header / Navigation ===== -->
+  <header class="site-header">
+    <nav class="nav" aria-label="Main navigation">
+
+      <a href="#top" class="nav__logo" aria-label="Game Hub home">
+        CHgames
+      </a>
+
+      <ul class="nav__links">
+        
+        <li>
+          <a href="#arcade">Arcade</a>
+        </li>
+
+        <li>
+          <a href="#puzzle">Puzzle</a>
+        </li>
+      </ul>
+
+      <button
+        class="nav__theme-toggle"
+        id="themeToggle"
+        type="button"
+        aria-label="Toggle dark mode"
+        aria-pressed="false"
+      >
+        ◐
+      </button>
+
+    </nav>
+  </header>
+
+
+  <main>
+
+    <!-- ===== Hero ===== -->
+    <section id="top" class="hero" aria-labelledby="hero-title">
+
+      <div class="hero__content">
+
+        <p class="hero__eyebrow">
+          Game Hub
+        </p>
+
+        <h1 id="hero-title" class="hero__name">
+          Play.
+          <br />
+          Have Fun.
+        </h1>
+
+        <p class="hero__tagline">
+          A collection of games you can play right in your browser.
+        </p>
+
+        <div class="hero__actions">
+          <a href="#games" class="btn btn--ghost">
+            Browse Games
+          </a>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===== Games ===== -->
+    <section
+      id="games"
+      class="section"
+      aria-labelledby="games-title"
+    >
+
+      <header class="section__header">
+
+        <p class="section__eyebrow">
+          Collection
+        </p>
+
+        <h2 id="games-title" class="section__title">
+          Games
+        </h2>
+
+      </header>
+
+
+
+
+      <!-- ===== Arcade Games ===== -->
+      <section
+        id="arcade"
+        class="game-category"
+        aria-labelledby="arcade-title"
+      >
+
+        <header class="category__header">
+          <span class="category__number">01</span>
+
+          <h3 id="arcade-title">
+            Arcade
+          </h3>
+        </header>
+
+
+        <div class="game-grid">
+
+          <a href="#" class="game-card">
+            <span class="game-card__number">01</span>
+
+            <div>
+              <h4>Game Three</h4>
+              <p>Classic arcade gameplay.</p>
+            </div>
+
+            <span class="game-card__arrow">
+              →
+            </span>
+          </a>
+
+
+          <a href="#" class="game-card">
+            <span class="game-card__number">02</span>
+
+            <div>
+              <h4>Game Four</h4>
+              <p>Simple and addictive.</p>
+            </div>
+
+            <span class="game-card__arrow">
+              →
+            </span>
+          </a>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===== Puzzle Games ===== -->
+      <section
+        id="puzzle"
+        class="game-category"
+        aria-labelledby="puzzle-title"
+      >
+
+        <header class="category__header">
+          <span class="category__number">02</span>
+
+          <h3 id="puzzle-title">
+            Puzzle
+          </h3>
+        </header>
+
+
+        <div class="game-grid">
+
+          <a href="#" class="game-card">
+            <span class="game-card__number">01</span>
+
+            <div>
+              <h4>Game Five</h4>
+              <p>Put your brain to work.</p>
+            </div>
+
+            <span class="game-card__arrow">
+              →
+            </span>
+          </a>
+
+
+          <a href="#" class="game-card">
+            <span class="game-card__number">02</span>
+
+            <div>
+              <h4>Game Six</h4>
+              <p>Think. Solve. Win.</p>
+            </div>
+
+            <span class="game-card__arrow">
+              →
+            </span>
+          </a>
+
+        </div>
+
+      </section>
+
+    </section>
+
+  </main>
+
+
+  <!-- ===== Footer ===== -->
+  <footer class="site-footer">
+
+    <p>
+      &copy; <span id="year"></span> CHgames Game Hub.
+    </p>
+
+  </footer>
+
+
+  <script src="script.js"></script>
+
+</body>
+</html>
