@@ -35,6 +35,7 @@
     }
     
     async function recordCheckersWin() {
+
       if (winRecorded) {
         return;
       }
@@ -48,7 +49,21 @@
       }
     
       try {
+    
         const username = getUsername();
+    
+        // HARD MODE = 5 WINS
+        // EASY / MEDIUM = 1 WIN
+        const winsToAdd =
+           difficulty === "hard"
+             ? 5
+             : difficulty === "medium"
+               ? 2
+               : 1;
+    
+        console.log(
+          `Recording ${winsToAdd} Checkers win(s) for ${difficulty} mode.`
+        );
     
         const {
           data: existingPlayer,
@@ -62,6 +77,7 @@
           .maybeSingle();
     
         if (selectError) {
+    
           console.error(
             "Error finding player:",
             selectError
@@ -78,25 +94,24 @@
         if (existingPlayer) {
     
           const checkersWins =
-            Number(existingPlayer.checkers_wins || 0) + 1;
-    
-          const ticTacToeWins =
-            Number(existingPlayer.tictactoe_wins || 0);
-    
-          const totalWins =
-            checkersWins + ticTacToeWins;
+            Number(
+              existingPlayer.checkers_wins || 0
+            ) + winsToAdd;
     
           const {
             error: updateError
           } = await supabaseClient
             .from("player_stats")
             .update({
-              checkers_wins: checkersWins,
-              total_wins: totalWins
+              checkers_wins: checkersWins
             })
-            .eq("id", existingPlayer.id);
+            .eq(
+              "id",
+              existingPlayer.id
+            );
     
           if (updateError) {
+    
             console.error(
               "Error updating Checkers wins:",
               updateError
@@ -107,8 +122,9 @@
           }
     
           console.log(
-            "Checkers win recorded!"
+            `Checkers win recorded: +${winsToAdd}`
           );
+    
         }
     
         // ========================================
@@ -123,12 +139,12 @@
             .from("player_stats")
             .insert({
               username: username,
-              checkers_wins: 1,
-              tictactoe_wins: 0,
-              total_wins: 1
+              checkers_wins: winsToAdd,
+              tictactoe_wins: 0
             });
     
           if (insertError) {
+    
             console.error(
               "Error creating player:",
               insertError
@@ -139,7 +155,7 @@
           }
     
           console.log(
-            "Player created and Checkers win recorded!"
+            `Player created and Checkers win recorded: +${winsToAdd}`
           );
         }
     
