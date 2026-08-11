@@ -91,6 +91,7 @@ function getUsername() {
 // SUPABASE
 // ============================================================
 
+
 async function recordTicTacToeWin() {
 
     if (winRecorded) {
@@ -101,13 +102,33 @@ async function recordTicTacToeWin() {
 
     try {
 
+        // Use the browser-compatible Supabase CDN.
         const {
             createClient
-        } = await import("./lib/supabase.js");
+        } = await import(
+            "https://esm.sh/@supabase/supabase-js@2"
+        );
 
-        const supabase = createClient();
+        const supabaseUrl =
+            "https://ijtclttmxnckpieqkaki.supabase.co";
 
-        const username = getUsername();
+        const supabaseKey =
+            "sb_publishable_ntobIYEBKNJI3tPpfD_izQ_xLJ-n7UL";
+
+        const supabase =
+            createClient(
+                supabaseUrl,
+                supabaseKey
+            );
+
+
+        const username =
+            getUsername();
+
+
+        // ========================================
+        // FIND PLAYER
+        // ========================================
 
         const {
             data: existingPlayer,
@@ -115,10 +136,14 @@ async function recordTicTacToeWin() {
         } = await supabase
             .from("player_stats")
             .select(
-                "id, username, checkers_wins, tictactoe_wins"
+                "id, username, checkers_wins, tictactoe_wins, total_wins"
             )
-            .eq("username", username)
+            .eq(
+                "username",
+                username
+            )
             .maybeSingle();
+
 
         if (selectError) {
 
@@ -128,8 +153,14 @@ async function recordTicTacToeWin() {
             );
 
             winRecorded = false;
+
             return;
         }
+
+
+        // ========================================
+        // PLAYER EXISTS
+        // ========================================
 
         if (existingPlayer) {
 
@@ -144,20 +175,28 @@ async function recordTicTacToeWin() {
                 ) + 1;
 
             const totalWins =
-                checkersWins + ticTacToeWins;
+                checkersWins +
+                ticTacToeWins;
+
 
             const {
                 error: updateError
             } = await supabase
                 .from("player_stats")
                 .update({
-                    tictactoe_wins: ticTacToeWins,
-                    total_wins: totalWins
+
+                    tictactoe_wins:
+                        ticTacToeWins,
+
+                    total_wins:
+                        totalWins
+
                 })
                 .eq(
                     "id",
                     existingPlayer.id
                 );
+
 
             if (updateError) {
 
@@ -167,25 +206,44 @@ async function recordTicTacToeWin() {
                 );
 
                 winRecorded = false;
+
                 return;
             }
+
 
             console.log(
                 "Tic-Tac-Toe win recorded!"
             );
 
-        } else {
+        }
+
+
+        // ========================================
+        // PLAYER DOESN'T EXIST
+        // ========================================
+
+        else {
 
             const {
                 error: insertError
             } = await supabase
                 .from("player_stats")
                 .insert({
-                    username: username,
-                    checkers_wins: 0,
-                    tictactoe_wins: 1,
-                    total_wins: 1
+
+                    username:
+                        username,
+
+                    checkers_wins:
+                        0,
+
+                    tictactoe_wins:
+                        1,
+
+                    total_wins:
+                        1
+
                 });
+
 
             if (insertError) {
 
@@ -195,13 +253,16 @@ async function recordTicTacToeWin() {
                 );
 
                 winRecorded = false;
+
                 return;
             }
+
 
             console.log(
                 "Player created and Tic-Tac-Toe win recorded!"
             );
         }
+
 
     } catch (error) {
 
@@ -213,6 +274,8 @@ async function recordTicTacToeWin() {
         winRecorded = false;
     }
 }
+
+
 
 
 // ============================================================
