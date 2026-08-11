@@ -1,12 +1,18 @@
+
+"use strict";
+
+// ============================================================
+// TIC-TAC-TOE
+// ============================================================
+
 const cells = document.querySelectorAll(".cell");
 const statusText = document.getElementById("status");
 const restartButton = document.getElementById("restart");
 
-let board = ["", "", "", "", "", "", "", "",];
-
 const PLAYER = "X";
 const BOT = "O";
 
+let board = ["", "", "", "", "", "", "", ""];
 let gameOver = false;
 let botThinking = false;
 let winRecorded = false;
@@ -62,20 +68,10 @@ async function recordTicTacToeWin() {
     winRecorded = true;
 
     try {
-        const { createClient } = await import(
-            "https://esm.sh/@supabase/supabase-js@2"
-        );
+        const { createClient } =
+            await import("./lib/supabase.js");
 
-        const supabaseUrl =
-            "https://ijtclttmxnckpieqkaki.supabase.co";
-
-        const supabaseKey =
-            "sb_publishable_ntobIYEBKNJI3tPpfD_izQ_xLJ-n7UL";
-
-        const supabase = createClient(
-            supabaseUrl,
-            supabaseKey
-        );
+        const supabase = createClient();
 
         const username = getUsername();
 
@@ -85,7 +81,7 @@ async function recordTicTacToeWin() {
         } = await supabase
             .from("player_stats")
             .select(
-                "id, username, checkers_wins, tictactoe_wins, total_wins"
+                "id, username, checkers_wins, tictactoe_wins"
             )
             .eq("username", username)
             .maybeSingle();
@@ -132,6 +128,7 @@ async function recordTicTacToeWin() {
             console.log(
                 "Tic-Tac-Toe win recorded!"
             );
+
         } else {
             const { error: insertError } =
                 await supabase
@@ -157,6 +154,7 @@ async function recordTicTacToeWin() {
                 "Player created and Tic-Tac-Toe win recorded!"
             );
         }
+
     } catch (error) {
         console.error(
             "Supabase error:",
@@ -168,28 +166,42 @@ async function recordTicTacToeWin() {
 }
 
 // ============================================================
-// PLAYER MOVE
+// PLAYER CLICK
 // ============================================================
 
 cells.forEach((cell) => {
+
     cell.addEventListener("click", () => {
+
+        console.log(
+            "Clicked cell:",
+            cell.dataset.index
+        );
 
         if (gameOver || botThinking) {
             return;
         }
 
-        const index = Number(cell.dataset.index);
+        const index =
+            Number(cell.dataset.index);
 
-        if (board[index] !== "") {
+        if (
+            index < 0 ||
+            index > 8 ||
+            board[index] !== ""
+        ) {
             return;
         }
 
-        // Player move
+        // PLAYER MOVE
         makeMove(index, PLAYER);
 
-        // Check if player won
+        // PLAYER WIN
         if (checkWinner(board, PLAYER)) {
-            statusText.textContent = "You win! 🎉";
+
+            statusText.textContent =
+                "You win! 🎉";
+
             gameOver = true;
 
             recordTicTacToeWin();
@@ -197,21 +209,29 @@ cells.forEach((cell) => {
             return;
         }
 
-        // Check draw
+        // DRAW
         if (isBoardFull(board)) {
-            statusText.textContent = "It's a draw! 🤝";
+
+            statusText.textContent =
+                "It's a draw! 🤝";
+
             gameOver = true;
+
             return;
         }
 
-        // Bot turn
+        // BOT TURN
         botThinking = true;
-        statusText.textContent = "Bot is thinking...";
+
+        statusText.textContent =
+            "Bot is thinking...";
 
         setTimeout(() => {
             botMove();
         }, 400);
+
     });
+
 });
 
 // ============================================================
@@ -219,17 +239,41 @@ cells.forEach((cell) => {
 // ============================================================
 
 function makeMove(index, player) {
+
+    if (
+        index < 0 ||
+        index > 8
+    ) {
+        return;
+    }
+
+    if (board[index] !== "") {
+        return;
+    }
+
     board[index] = player;
 
     cells[index].textContent = player;
 
-    cells[index].classList.remove("x", "o");
+    cells[index].classList.remove(
+        "x",
+        "o"
+    );
 
     cells[index].classList.add(
         player.toLowerCase()
     );
 
     cells[index].disabled = true;
+
+    console.log(
+        `${player} placed at cell ${index}`
+    );
+
+    console.log(
+        "Current board:",
+        board
+    );
 }
 
 // ============================================================
@@ -239,19 +283,31 @@ function makeMove(index, player) {
 function botMove() {
 
     if (gameOver) {
-        botThinking = false;
         return;
     }
 
     const bestMove = getBestMove();
 
-    if (bestMove !== -1) {
-        makeMove(bestMove, BOT);
+    console.log(
+        "Bot chose cell:",
+        bestMove
+    );
+
+    if (bestMove === -1) {
+        botThinking = false;
+        return;
     }
 
-    // Bot won
+    makeMove(
+        bestMove,
+        BOT
+    );
+
+    // BOT WIN
     if (checkWinner(board, BOT)) {
-        statusText.textContent = "The bot wins! 🤖";
+
+        statusText.textContent =
+            "The bot wins! 🤖";
 
         gameOver = true;
         botThinking = false;
@@ -259,9 +315,11 @@ function botMove() {
         return;
     }
 
-    // Draw
+    // DRAW
     if (isBoardFull(board)) {
-        statusText.textContent = "It's a draw! 🤝";
+
+        statusText.textContent =
+            "It's a draw! 🤝";
 
         gameOver = true;
         botThinking = false;
@@ -281,7 +339,9 @@ function botMove() {
 
 function getBestMove() {
 
+    // --------------------------------------------------------
     // 1. BOT CAN WIN
+    // --------------------------------------------------------
 
     for (let i = 0; i < 9; i++) {
 
@@ -289,18 +349,18 @@ function getBestMove() {
 
             board[i] = BOT;
 
-            const wins =
-                checkWinner(board, BOT);
-
-            board[i] = "";
-
-            if (wins) {
+            if (checkWinner(board, BOT)) {
+                board[i] = "";
                 return i;
             }
+
+            board[i] = "";
         }
     }
 
+    // --------------------------------------------------------
     // 2. BLOCK PLAYER
+    // --------------------------------------------------------
 
     for (let i = 0; i < 9; i++) {
 
@@ -308,30 +368,38 @@ function getBestMove() {
 
             board[i] = PLAYER;
 
-            const playerWins =
-                checkWinner(board, PLAYER);
-
-            board[i] = "";
-
-            if (playerWins) {
+            if (checkWinner(board, PLAYER)) {
+                board[i] = "";
                 return i;
             }
+
+            board[i] = "";
         }
     }
 
+    // --------------------------------------------------------
     // 3. CENTER
+    // --------------------------------------------------------
 
     if (board[4] === "") {
         return 4;
     }
 
+    // --------------------------------------------------------
     // 4. CORNERS
+    // --------------------------------------------------------
 
-    const corners = [0, 2, 6, 8];
+    const corners = [
+        0,
+        2,
+        6,
+        8
+    ];
 
     const availableCorners =
         corners.filter(
-            (index) => board[index] === ""
+            (index) =>
+                board[index] === ""
         );
 
     if (availableCorners.length > 0) {
@@ -344,7 +412,9 @@ function getBestMove() {
         ];
     }
 
-    // 5. ANY AVAILABLE SPACE
+    // --------------------------------------------------------
+    // 5. ANY REMAINING SPACE
+    // --------------------------------------------------------
 
     const availableSpaces = [];
 
@@ -377,9 +447,11 @@ function checkWinner(currentBoard, player) {
     return winningCombinations.some(
         (combination) => {
 
-            const a = combination[0];
-            const b = combination[1];
-            const c = combination[2];
+            const [
+                a,
+                b,
+                c
+            ] = combination;
 
             return (
                 currentBoard[a] === player &&
@@ -397,7 +469,8 @@ function checkWinner(currentBoard, player) {
 function isBoardFull(currentBoard) {
 
     return currentBoard.every(
-        (square) => square !== ""
+        (square) =>
+            square !== ""
     );
 }
 
@@ -427,18 +500,34 @@ function restartGame() {
     botThinking = false;
     winRecorded = false;
 
-    cells.forEach((cell) => {
+    cells.forEach(
+        (cell) => {
 
-        cell.textContent = "";
+            cell.textContent = "";
 
-        cell.classList.remove(
-            "x",
-            "o"
-        );
+            cell.classList.remove(
+                "x",
+                "o"
+            );
 
-        cell.disabled = false;
-    });
+            cell.disabled = false;
+        }
+    );
 
     statusText.textContent =
         "Your turn — You are X";
 }
+
+// ============================================================
+// DEBUG
+// ============================================================
+
+console.log(
+    "Tic-Tac-Toe loaded."
+);
+
+console.log(
+    "Number of cells found:",
+    cells.length
+);
+
