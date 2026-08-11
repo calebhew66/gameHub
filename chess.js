@@ -2577,5 +2577,22 @@
       );
   
     }
-  
+    window.testCheckersWin = async function (mode) {
+
+      difficulty = mode;
+      winRecorded = false;
+    
+      console.log(
+        `Testing ${mode}: should add ${
+          mode === "hard"
+            ? 5
+            : mode === "medium"
+              ? 2
+              : 1
+        } win(s).`
+      );
+    
+      await recordCheckersWin();
+    
+    };
   })();
