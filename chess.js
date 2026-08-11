@@ -1,6 +1,138 @@
-
 (function () {
     "use strict";
+  
+    // ============================================================
+    // SUPABASE CHECKERS WIN TRACKING
+    // ============================================================
+  
+    const supabaseClient = window.supabaseClient;
+  
+    let winRecorded = false;
+  
+    function getUsername() {
+      let username = localStorage.getItem("chgames_username");
+  
+      if (!username) {
+        username = prompt("Enter your CHgames username:");
+  
+        if (!username) {
+          username = "Player";
+        }
+  
+        username = username.trim().slice(0, 20);
+  
+        if (!username) {
+          username = "Player";
+        }
+  
+        localStorage.setItem(
+          "chgames_username",
+          username
+        );
+      }
+  
+      return username;
+    }
+  
+    async function recordCheckersWin() {
+      if (winRecorded) {
+        return;
+      }
+  
+      winRecorded = true;
+  
+      if (!supabaseClient) {
+        console.error("Supabase client was not found.");
+        winRecorded = false;
+        return;
+      }
+  
+      try {
+        const username = getUsername();
+  
+        const {
+          data: existingPlayer,
+          error: selectError
+        } = await supabaseClient
+          .from("player_stats")
+          .select("id, username, chess_wins, tictactoe_wins")
+          .eq("username", username)
+          .maybeSingle();
+  
+        if (selectError) {
+          console.error(
+            "Error finding player:",
+            selectError
+          );
+  
+          winRecorded = false;
+          return;
+        }
+  
+        // Player already exists
+        if (existingPlayer) {
+          const {
+            error: updateError
+          } = await supabaseClient
+            .from("player_stats")
+            .update({
+              chess_wins:
+                (existingPlayer.chess_wins || 0) + 1
+            })
+            .eq("id", existingPlayer.id);
+  
+          if (updateError) {
+            console.error(
+              "Error updating Checkers wins:",
+              updateError
+            );
+  
+            winRecorded = false;
+            return;
+          }
+  
+          console.log(
+            "Checkers win recorded!"
+          );
+        }
+  
+        // Player doesn't exist yet
+        else {
+          const {
+            error: insertError
+          } = await supabaseClient
+            .from("player_stats")
+            .insert({
+              username: username,
+              chess_wins: 1,
+              tictactoe_wins: 0
+            });
+  
+          if (insertError) {
+            console.error(
+              "Error creating player:",
+              insertError
+            );
+  
+            winRecorded = false;
+            return;
+          }
+  
+          console.log(
+            "Player created and Checkers win recorded!"
+          );
+        }
+  
+      } catch (error) {
+        console.error(
+          "Supabase error:",
+          error
+        );
+  
+        winRecorded = false;
+      }
+    }
+  
   
     /*
      * ============================================================
@@ -1035,6 +1167,7 @@
   
   
       // Update capture counters
+  
       for (
         const step of chosen.path
       ) {
@@ -1069,7 +1202,6 @@
       }
   
   
-      // Animate each step in sequence
       animateBotTurn(
         chosen,
         captureCount,
@@ -1086,9 +1218,6 @@
     ) {
   
       animationLock = true;
-  
-      const originalBoard =
-        cloneBoard(board);
   
   
       for (
@@ -1226,9 +1355,6 @@
       }
   
   
-      // If we're in a forced continuation,
-      // the player cannot select another piece.
-  
       if (forcedContinue) {
         return;
       }
@@ -1276,16 +1402,6 @@
   
       let moves;
   
-  
-      /*
-       * IMPORTANT:
-       *
-       * If several pieces can capture,
-       * the player can choose WHICH piece.
-       *
-       * Once they choose one, that piece is
-       * the only piece that can continue.
-       */
   
       if (mustCapture) {
   
@@ -1475,13 +1591,6 @@
       }
   
   
-      /*
-       * FORCE CONTINUATION
-       *
-       * Only the piece that just captured
-       * can continue.
-       */
-  
       if (
         target.isJump &&
         !promoted
@@ -1652,11 +1761,16 @@
     }
   
   
+    // ============================================================
+    // GAME OVER
+    // ============================================================
+  
     function showGameOver(
       winnerColor
     ) {
   
       gameOver = true;
+  
   
       const youWon =
         winnerColor === playerColor;
@@ -1673,9 +1787,12 @@
       );
   
   
+      // Record Checkers win in Supabase
       if (youWon) {
   
         taphReact("win");
+  
+        recordCheckersWin();
   
       } else {
   
@@ -1838,6 +1955,7 @@
   
       capturedBlackEl.innerHTML = "";
   
+  
       for (
         let i = 0;
         i < capturedBlack;
@@ -1858,6 +1976,7 @@
   
   
       capturedWhiteEl.innerHTML = "";
+  
   
       for (
         let i = 0;
@@ -1935,12 +2054,8 @@
       board =
         initBoard();
   
-  
-      // WHITE ALWAYS GOES FIRST
-  
       currentTurn =
         "white";
-  
   
       selected = null;
   
@@ -1952,6 +2067,7 @@
   
       animationLock = false;
   
+      winRecorded = false;
   
       capturedBlack = 0;
   
@@ -1962,16 +2078,13 @@
         "hidden"
       );
   
-  
       gameScreen.classList.remove(
         "hidden"
       );
   
-  
       chatPanel.classList.remove(
         "hidden"
       );
-  
   
       overlay.classList.add(
         "hidden"
@@ -1979,7 +2092,6 @@
   
   
       clearChat();
-  
   
       renderBoard();
   
@@ -2016,10 +2128,6 @@
         500
       );
   
-  
-      // Since WHITE starts, the bot only
-      // moves immediately if the player
-      // selected BLACK.
   
       if (
         currentTurn === botColor
@@ -2301,9 +2409,10 @@
   
   
       taphTyping(
-        () => addTaphMessage(
-          message
-        )
+        () =>
+          addTaphMessage(
+            message
+          )
       );
   
     }
@@ -2331,11 +2440,6 @@
   
       chatInput.value = "";
   
-  
-      /*
-       * Taph doesn't use normal dialogue
-       * here. They respond through reactions.
-       */
   
       setTimeout(
         () => {

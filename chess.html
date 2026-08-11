@@ -1,5 +1,5 @@
-
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -11,223 +11,298 @@
 <body>
 
   <!-- ===================== MAIN LAYOUT ===================== -->
+
   <div class="game-layout">
 
-    <!-- ===================== CHECKERS GAME ===================== -->
-    <main id="setup-screen" class="screen">
-      <section class="setup-card">
+```
+<!-- ===================== CHECKERS GAME ===================== -->
+<main id="setup-screen" class="screen">
+  <section class="setup-card">
 
-        <p class="eyebrow">Classic board game</p>
-        <h1 class="title">Checkers</h1>
 
-        <div class="setup-section">
-          <h2 class="section-label">Choose your color</h2>
+    <p class="eyebrow">Classic board game</p>
+    <h1 class="title">Checkers</h1>
 
-          <div class="option-row">
 
-            <button class="option-btn color-option"
-                    data-color="black"
-                    type="button">
-              <span class="option-swatch swatch-black"></span>
-              Black
-            </button>
+    <div class="setup-section">
+      <h2 class="section-label">Choose your color</h2>
 
-            <button class="option-btn color-option"
-                    data-color="white"
-                    type="button">
-              <span class="option-swatch swatch-white"></span>
-              White
-            </button>
 
-            <button class="option-btn color-option"
-                    data-color="random"
-                    type="button">
-              <span class="option-swatch swatch-random"></span>
-              Random
-            </button>
+      <div class="option-row">
 
-          </div>
-        </div>
 
-        <div class="setup-section">
-          <h2 class="section-label">Choose difficulty</h2>
-
-          <div class="option-row">
-
-            <button class="option-btn difficulty-option"
-                    data-difficulty="easy"
-                    type="button">
-              Easy
-            </button>
-
-            <button class="option-btn difficulty-option"
-                    data-difficulty="medium"
-                    type="button">
-              Medium
-            </button>
-
-            <button class="option-btn difficulty-option"
-                    data-difficulty="hard"
-                    type="button">
-              Hard
-            </button>
-
-          </div>
-        </div>
-
-        <button id="start-btn"
-                class="start-btn"
-                type="button"
-                disabled>
-          Start Game
+        <button class="option-btn color-option"
+                data-color="black"
+                type="button">
+          <span class="option-swatch swatch-black"></span>
+          Black
         </button>
 
-      </section>
-    </main>
 
-
-    <!-- ===================== GAME SCREEN ===================== -->
-    <main id="game-screen" class="screen hidden">
-
-      <div class="game-wrap">
-
-        <header class="game-header">
-
-          <div>
-            <p class="eyebrow">Classic checkers</p>
-            <h1 class="title small">Checkers</h1>
-
-            <p id="status" class="status-text">
-              White to move
-            </p>
-          </div>
-
-          <div class="header-right">
-
-            <div class="turn-pill">
-              <span class="turn-dot"></span>
-              <span id="turn-label">White to move</span>
-            </div>
-
-            <button id="new-game-btn"
-                    class="ghost-btn"
-                    type="button">
-              New Game
-            </button>
-
-          </div>
-
-        </header>
-
-
-        <section class="board-frame">
-          <div id="board"></div>
-        </section>
-
-
-        <section class="captured-row">
-
-          <div class="captured-group">
-            <div class="captured-label">Black captured</div>
-            <div id="captured-black"
-                 class="captured-pieces"></div>
-          </div>
-
-          <div class="captured-group">
-            <div class="captured-label">White captured</div>
-            <div id="captured-white"
-                 class="captured-pieces"></div>
-          </div>
-
-        </section>
-
-      </div>
-
-    </main>
-
-
-    <!-- ===================== TAPH CHAT ===================== -->
-    <aside id="chat-panel" class="chat-panel hidden">
-
-      <div class="chat-header">
-
-        <div class="taph-avatar">
-          T
-        </div>
-
-        <div class="taph-info">
-          <div class="taph-name">Taph</div>
-          <div class="taph-status">
-            <span class="online-dot"></span>
-            Watching
-          </div>
-        </div>
-
-      </div>
-
-
-      <div id="chat-messages" class="chat-messages">
-
-        <div class="chat-message taph-message">
-          <div class="message-avatar">T</div>
-          <div class="message-bubble">
-            👀
-          </div>
-        </div>
-
-      </div>
-
-
-      <div class="chat-input-area">
-
-        <input
-          id="chat-input"
-          class="chat-input"
-          type="text"
-          maxlength="100"
-          placeholder="Type a message..."
-          autocomplete="off"
-        >
-
-        <button
-          id="chat-send"
-          class="chat-send"
-          type="button"
-          aria-label="Send message"
-        >
-          ➤
+        <button class="option-btn color-option"
+                data-color="white"
+                type="button">
+          <span class="option-swatch swatch-white"></span>
+          White
         </button>
 
+
+        <button class="option-btn color-option"
+                data-color="random"
+                type="button">
+          <span class="option-swatch swatch-random"></span>
+          Random
+        </button>
+
+
+      </div>
+    </div>
+
+
+    <div class="setup-section">
+      <h2 class="section-label">Choose difficulty</h2>
+
+
+      <div class="option-row">
+
+
+        <button class="option-btn difficulty-option"
+                data-difficulty="easy"
+                type="button">
+          Easy
+        </button>
+
+
+        <button class="option-btn difficulty-option"
+                data-difficulty="medium"
+                type="button">
+          Medium
+        </button>
+
+
+        <button class="option-btn difficulty-option"
+                data-difficulty="hard"
+                type="button">
+          Hard
+        </button>
+
+
+      </div>
+    </div>
+
+
+    <button id="start-btn"
+            class="start-btn"
+            type="button"
+            disabled>
+      Start Game
+    </button>
+
+
+  </section>
+</main>
+
+
+
+<!-- ===================== GAME SCREEN ===================== -->
+<main id="game-screen" class="screen hidden">
+
+
+  <div class="game-wrap">
+
+
+    <header class="game-header">
+
+
+      <div>
+        <p class="eyebrow">Classic checkers</p>
+        <h1 class="title small">Checkers</h1>
+
+
+        <p id="status" class="status-text">
+          White to move
+        </p>
       </div>
 
-    </aside>
+
+      <div class="header-right">
+
+
+        <div class="turn-pill">
+          <span class="turn-dot"></span>
+          <span id="turn-label">White to move</span>
+        </div>
+
+
+        <button id="new-game-btn"
+                class="ghost-btn"
+                type="button">
+          New Game
+        </button>
+
+
+      </div>
+
+
+    </header>
+
+
+
+    <section class="board-frame">
+      <div id="board"></div>
+    </section>
+
+
+
+    <section class="captured-row">
+
+
+      <div class="captured-group">
+        <div class="captured-label">Black captured</div>
+        <div id="captured-black"
+             class="captured-pieces"></div>
+      </div>
+
+
+      <div class="captured-group">
+        <div class="captured-label">White captured</div>
+        <div id="captured-white"
+             class="captured-pieces"></div>
+      </div>
+
+
+    </section>
+
 
   </div>
 
 
+</main>
+
+
+
+<!-- ===================== TAPH CHAT ===================== -->
+<aside id="chat-panel" class="chat-panel hidden">
+
+
+  <div class="chat-header">
+
+
+    <div class="taph-avatar">
+      T
+    </div>
+
+
+    <div class="taph-info">
+      <div class="taph-name">Taph</div>
+      <div class="taph-status">
+        <span class="online-dot"></span>
+        Watching
+      </div>
+    </div>
+
+
+  </div>
+
+
+
+  <div id="chat-messages" class="chat-messages">
+
+
+    <div class="chat-message taph-message">
+      <div class="message-avatar">T</div>
+      <div class="message-bubble">
+        👀
+      </div>
+    </div>
+
+
+  </div>
+
+
+
+  <div class="chat-input-area">
+
+
+    <input
+      id="chat-input"
+      class="chat-input"
+      type="text"
+      maxlength="100"
+      placeholder="Type a message..."
+      autocomplete="off"
+    >
+
+
+    <button
+      id="chat-send"
+      class="chat-send"
+      type="button"
+      aria-label="Send message"
+    >
+      ➤
+    </button>
+
+
+  </div>
+
+
+</aside>
+```
+
+  </div>
+
   <!-- ===================== GAME OVER ===================== -->
+
   <div id="game-over-overlay"
        class="overlay hidden">
 
-    <div class="overlay-card">
+```
+<div class="overlay-card">
 
-      <h2 id="game-over-text"
-          class="overlay-title">
-        You win!
-      </h2>
 
-      <button id="play-again-btn"
-              class="start-btn"
-              type="button">
-        Play Again
-      </button>
+  <h2 id="game-over-text"
+      class="overlay-title">
+    You win!
+  </h2>
 
-    </div>
+
+  <button id="play-again-btn"
+          class="start-btn"
+          type="button">
+    Play Again
+  </button>
+
+
+</div>
+```
 
   </div>
 
+  <!-- ===================== SUPABASE ===================== -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = "https://ijtclttmxnckpieqkaki.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_ntobIYEBKNJI3tPpfD_izQ_xLJ-n7UL";
+
+    window.supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+  </script>
+
+  <!-- ===================== CHECKERS JAVASCRIPT ===================== -->
+
+  <script type="module">
+    import { createClient } from "./lib/supabase.js";
+
+    window.supabaseClient = createClient();
+  </script>
 
   <script src="chess.js"></script>
+
 
 </body>
 </html>

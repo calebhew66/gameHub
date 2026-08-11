@@ -1,14 +1,15 @@
+
 const cells = document.querySelectorAll(".cell");
 const statusText = document.getElementById("status");
 const restartButton = document.getElementById("restart");
 
-let board = ["", "", "", "", "", "", "", "", ""];
-
+let board = ["", "", "", "", "", "", "", ""];
 const PLAYER = "X";
 const BOT = "O";
 
 let gameOver = false;
 let botThinking = false;
+let winRecorded = false;
 
 const winningCombinations = [
     [0, 1, 2],
@@ -23,6 +24,109 @@ const winningCombinations = [
     [2, 4, 6]
 ];
 
+// =========================
+// USERNAME
+// =========================
+
+function getUsername() {
+    let username = localStorage.getItem("chgames_username");
+
+    if (!username) {
+        username = prompt("Enter your CHgames username:");
+
+        if (!username) {
+            username = "Player";
+        }
+
+        username = username.trim().slice(0, 20);
+
+        if (!username) {
+            username = "Player";
+        }
+
+        localStorage.setItem("chgames_username", username);
+    }
+
+    return username;
+}
+
+// =========================
+// SUPABASE
+// =========================
+
+async function recordTicTacToeWin() {
+    if (winRecorded) {
+        return;
+    }
+
+    winRecorded = true;
+
+    try {
+        const { createClient } = await import("./lib/supabase.js");
+        const supabase = createClient();
+
+        const username = getUsername();
+
+        const { data: existingPlayer, error: selectError } =
+            await supabase
+                .from("player_stats")
+                .select("id, tictactoe_wins")
+                .eq("username", username)
+                .maybeSingle();
+
+        if (selectError) {
+            console.error("Error finding player:", selectError);
+            winRecorded = false;
+            return;
+        }
+
+        if (existingPlayer) {
+            const { error: updateError } = await supabase
+                .from("player_stats")
+                .update({
+                    tictactoe_wins: existingPlayer.tictactoe_wins + 1
+                })
+                .eq("id", existingPlayer.id);
+
+            if (updateError) {
+                console.error(
+                    "Error updating Tic-Tac-Toe wins:",
+                    updateError
+                );
+
+                winRecorded = false;
+                return;
+            }
+
+            console.log("Tic-Tac-Toe win recorded!");
+        } else {
+            const { error: insertError } = await supabase
+                .from("player_stats")
+                .insert({
+                    username: username,
+                    checkers_wins: 0,
+                    tictactoe_wins: 1
+                });
+
+            if (insertError) {
+                console.error(
+                    "Error creating player:",
+                    insertError
+                );
+
+                winRecorded = false;
+                return;
+            }
+
+            console.log(
+                "Player created and Tic-Tac-Toe win recorded!"
+            );
+        }
+    } catch (error) {
+        console.error("Supabase error:", error);
+        winRecorded = false;
+    }
+}
 
 // =========================
 // PLAYER MOVE
@@ -48,6 +152,9 @@ cells.forEach((cell) => {
         if (checkWinner(board, PLAYER)) {
             statusText.textContent = "You win! 🎉";
             gameOver = true;
+
+            recordTicTacToeWin();
+
             return;
         }
 
@@ -62,13 +169,11 @@ cells.forEach((cell) => {
         botThinking = true;
         statusText.textContent = "Bot is thinking...";
 
-        // Small delay makes the bot feel more natural
         setTimeout(() => {
             botMove();
         }, 400);
     });
 });
-
 
 // =========================
 // MAKE MOVE
@@ -82,7 +187,6 @@ function makeMove(index, player) {
 
     cells[index].disabled = true;
 }
-
 
 // =========================
 // BOT MOVE
@@ -120,7 +224,6 @@ function botMove() {
     statusText.textContent = "Your turn — You are X";
 }
 
-
 // =========================
 // BOT AI
 // =========================
@@ -143,9 +246,7 @@ function getBestMove() {
         }
     }
 
-
     // 2. Can the player win next?
-    // Block them.
     for (let i = 0; i < 9; i++) {
 
         if (board[i] === "") {
@@ -161,12 +262,10 @@ function getBestMove() {
         }
     }
 
-
     // 3. Take the center
     if (board[4] === "") {
         return 4;
     }
-
 
     // 4. Take a corner
     const corners = [0, 2, 6, 8];
@@ -180,7 +279,6 @@ function getBestMove() {
             Math.floor(Math.random() * availableCorners.length)
         ];
     }
-
 
     // 5. Take any remaining space
     const availableSpaces = [];
@@ -200,7 +298,6 @@ function getBestMove() {
     return -1;
 }
 
-
 // =========================
 // CHECK WINNER
 // =========================
@@ -219,7 +316,6 @@ function checkWinner(currentBoard, player) {
     });
 }
 
-
 // =========================
 // CHECK DRAW
 // =========================
@@ -227,7 +323,6 @@ function checkWinner(currentBoard, player) {
 function isBoardFull(currentBoard) {
     return currentBoard.every((square) => square !== "");
 }
-
 
 // =========================
 // RESTART GAME
@@ -237,10 +332,11 @@ restartButton.addEventListener("click", restartGame);
 
 function restartGame() {
 
-    board = ["", "", "", "", "", "", "", "", ""];
+    board = ["", "", "", "", "", "", "", ""];
 
     gameOver = false;
     botThinking = false;
+    winRecorded = false;
 
     cells.forEach((cell) => {
         cell.textContent = "";
@@ -250,3 +346,4 @@ function restartGame() {
 
     statusText.textContent = "Your turn — You are X";
 }
+
