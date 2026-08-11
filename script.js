@@ -1,35 +1,35 @@
 
 /* ========================================
-SUPABASE
+   SUPABASE
 ======================================== */
-
-// IMPORTANT:
-// Use your Supabase PROJECT URL here.
-// Use your Supabase PUBLISHABLE KEY here.
-// NEVER use your service-role/secret key.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const SUPABASE_URL = "https://ijtclttmxnckpieqkaki.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
+const supabaseUrl =
+  "https://ijtclttmxnckpieqkaki.supabase.co";
+
+const supabaseKey =
   "sb_publishable_ntobIYEBKNJI3tPpfD_izQ_xLJ-n7UL";
 
+
 const supabase = createClient(
-  SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
+  supabaseUrl,
+  supabaseKey
 );
 
 
 /* ========================================
-THEME TOGGLE
+   THEME TOGGLE
 ======================================== */
 
 const themeToggle =
   document.getElementById("themeToggle");
 
+
 const savedTheme =
   localStorage.getItem("theme");
+
 
 if (savedTheme === "dark") {
 
@@ -44,18 +44,22 @@ if (savedTheme === "dark") {
 
 }
 
+
 themeToggle.addEventListener("click", () => {
 
   const isDark =
     document.body.classList.toggle("dark-mode");
 
+
   themeToggle.textContent =
     isDark ? "○" : "◐";
+
 
   themeToggle.setAttribute(
     "aria-pressed",
     isDark ? "true" : "false"
   );
+
 
   localStorage.setItem(
     "theme",
@@ -66,33 +70,39 @@ themeToggle.addEventListener("click", () => {
 
 
 /* ========================================
-GAME ELEMENTS
+   GAME ELEMENTS
 ======================================== */
 
 const chessGameButton =
   document.getElementById("chessGameButton");
 
+
 const ticTacToeGameButton =
   document.getElementById("ticTacToeGameButton");
+
 
 const backToGames =
   document.getElementById("backToGames");
 
+
 const gameList =
   document.getElementById("gameList");
+
 
 const gameScreen =
   document.getElementById("gameScreen");
 
+
 const gameFrame =
   document.getElementById("gameFrame");
+
 
 const gameScreenTitle =
   document.getElementById("gameScreenTitle");
 
 
 /* ========================================
-OPEN CHESS
+   OPEN CHESS
 ======================================== */
 
 chessGameButton.addEventListener("click", () => {
@@ -103,7 +113,10 @@ chessGameButton.addEventListener("click", () => {
 
   gameScreenTitle.textContent = "Chess";
 
+  gameFrame.title = "Chess game";
+
   gameFrame.src = "chess.html";
+
 
   gameScreen.scrollIntoView({
     behavior: "smooth",
@@ -114,7 +127,7 @@ chessGameButton.addEventListener("click", () => {
 
 
 /* ========================================
-OPEN TIC-TAC-TOE
+   OPEN TIC-TAC-TOE
 ======================================== */
 
 ticTacToeGameButton.addEventListener("click", () => {
@@ -123,9 +136,15 @@ ticTacToeGameButton.addEventListener("click", () => {
 
   gameScreen.hidden = false;
 
-  gameScreenTitle.textContent = "Tic-Tac-Toe";
+  gameScreenTitle.textContent =
+    "Tic-Tac-Toe";
 
-  gameFrame.src = "tictactoe.html";
+  gameFrame.title =
+    "Tic-Tac-Toe game";
+
+  gameFrame.src =
+    "tictactoe.html";
+
 
   gameScreen.scrollIntoView({
     behavior: "smooth",
@@ -136,7 +155,7 @@ ticTacToeGameButton.addEventListener("click", () => {
 
 
 /* ========================================
-BACK TO GAMES
+   BACK TO GAMES
 ======================================== */
 
 backToGames.addEventListener("click", () => {
@@ -147,6 +166,7 @@ backToGames.addEventListener("click", () => {
 
   gameFrame.src = "";
 
+
   gameList.scrollIntoView({
     behavior: "smooth",
     block: "start"
@@ -156,12 +176,185 @@ backToGames.addEventListener("click", () => {
 
 
 /* ========================================
-LEADERBOARD
+   LEADERBOARD ELEMENTS
 ======================================== */
 
-const leaderboardList =
-  document.getElementById("leaderboardList");
+const leaderboardButton =
+  document.getElementById(
+    "leaderboardButton"
+  );
 
+
+const leaderboardPanel =
+  document.getElementById(
+    "leaderboardPanel"
+  );
+
+
+const leaderboardOverlay =
+  document.getElementById(
+    "leaderboardOverlay"
+  );
+
+
+const closeLeaderboard =
+  document.getElementById(
+    "closeLeaderboard"
+  );
+
+
+const leaderboardList =
+  document.getElementById(
+    "leaderboardList"
+  );
+
+
+/* ========================================
+   OPEN LEADERBOARD
+======================================== */
+
+async function openLeaderboard() {
+
+  leaderboardPanel.classList.add(
+    "is-open"
+  );
+
+
+  leaderboardOverlay.hidden = false;
+
+
+  leaderboardButton.setAttribute(
+    "aria-expanded",
+    "true"
+  );
+
+
+  leaderboardPanel.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+
+  document.body.style.overflow =
+    "hidden";
+
+
+  /*
+    Wait one frame before adding opacity.
+    This allows the overlay animation
+    to work correctly.
+  */
+
+  requestAnimationFrame(() => {
+
+    leaderboardOverlay.style.opacity =
+      "1";
+
+  });
+
+
+  await loadLeaderboard();
+
+}
+
+
+/* ========================================
+   CLOSE LEADERBOARD
+======================================== */
+
+function closeLeaderboardPanel() {
+
+  leaderboardPanel.classList.remove(
+    "is-open"
+  );
+
+
+  leaderboardOverlay.style.opacity =
+    "0";
+
+
+  leaderboardButton.setAttribute(
+    "aria-expanded",
+    "false"
+  );
+
+
+  leaderboardPanel.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+
+  document.body.style.overflow =
+    "";
+
+
+  setTimeout(() => {
+
+    if (
+      !leaderboardPanel.classList.contains(
+        "is-open"
+      )
+    ) {
+
+      leaderboardOverlay.hidden =
+        true;
+
+    }
+
+  }, 350);
+
+}
+
+
+/* ========================================
+   LEADERBOARD EVENTS
+======================================== */
+
+leaderboardButton.addEventListener(
+  "click",
+  openLeaderboard
+);
+
+
+closeLeaderboard.addEventListener(
+  "click",
+  closeLeaderboardPanel
+);
+
+
+leaderboardOverlay.addEventListener(
+  "click",
+  closeLeaderboardPanel
+);
+
+
+/* ========================================
+   ESC KEY
+======================================== */
+
+document.addEventListener(
+  "keydown",
+  (event) => {
+
+    if (
+      event.key === "Escape" &&
+      leaderboardPanel.classList.contains(
+        "is-open"
+      )
+    ) {
+
+      closeLeaderboardPanel();
+
+    }
+
+  }
+);
+
+
+/* ========================================
+   LOAD LEADERBOARD
+======================================== */
 
 async function loadLeaderboard() {
 
@@ -171,21 +364,45 @@ async function loadLeaderboard() {
     </div>
   `;
 
+
   try {
 
-    const { data, error } = await supabase
+    const {
+      data,
+      error
+    } = await supabase
+
       .from("player_stats")
+
       .select(
         "username, chess_wins, tictactoe_wins, total_wins"
       )
-      .order("total_wins", {
-        ascending: false
-      })
+
+      .order(
+        "total_wins",
+        {
+          ascending: false
+        }
+      )
+
       .limit(10);
 
 
     if (error) {
-      throw error;
+
+      console.error(
+        "Leaderboard error:",
+        error
+      );
+
+      leaderboardList.innerHTML = `
+        <div class="leaderboard__error">
+          Could not load leaderboard.
+        </div>
+      `;
+
+      return;
+
     }
 
 
@@ -198,66 +415,87 @@ async function loadLeaderboard() {
       `;
 
       return;
+
     }
 
 
-    leaderboardList.innerHTML = "";
+    leaderboardList.innerHTML =
+      data
+        .map(
+          (player, index) => {
+
+            const rank =
+              index + 1;
 
 
-    data.forEach((player, index) => {
+            return `
+              <div
+                class="leaderboard__player rank-${rank}"
+              >
 
-      const rank =
-        index + 1;
-
-      const playerElement =
-        document.createElement("div");
-
-      playerElement.className =
-        `leaderboard__player rank-${rank}`;
-
-
-      playerElement.innerHTML = `
-        <span class="leaderboard__rank">
-          #${rank}
-        </span>
-
-        <div>
-          <div class="leaderboard__player-name">
-            ${escapeHTML(player.username)}
-          </div>
-
-          <div class="leaderboard__games">
-            ♟ ${player.chess_wins} &nbsp;&nbsp;
-            ❌ ${player.tictactoe_wins}
-          </div>
-        </div>
-
-        <div class="leaderboard__total">
-          ${player.total_wins}
-
-          <span class="leaderboard__total-label">
-            WINS
-          </span>
-        </div>
-      `;
+                <div
+                  class="leaderboard__rank"
+                >
+                  #${rank}
+                </div>
 
 
-      leaderboardList.appendChild(
-        playerElement
-      );
+                <div>
 
-    });
+                  <div
+                    class="leaderboard__player-name"
+                  >
+                    ${escapeHTML(
+                      player.username
+                    )}
+                  </div>
+
+
+                  <div
+                    class="leaderboard__games"
+                  >
+                    Chess:
+                    ${player.chess_wins}
+                    &nbsp;•&nbsp;
+                    Tic-Tac-Toe:
+                    ${player.tictactoe_wins}
+                  </div>
+
+                </div>
+
+
+                <div
+                  class="leaderboard__total"
+                >
+
+                  ${player.total_wins}
+
+                  <span
+                    class="leaderboard__total-label"
+                  >
+                    WINS
+                  </span>
+
+                </div>
+
+              </div>
+            `;
+
+          }
+        )
+        .join("");
 
   } catch (error) {
 
     console.error(
-      "Leaderboard error:",
+      "Unexpected leaderboard error:",
       error
     );
 
+
     leaderboardList.innerHTML = `
       <div class="leaderboard__error">
-        Unable to load leaderboard.
+        Could not load leaderboard.
       </div>
     `;
 
@@ -267,28 +505,48 @@ async function loadLeaderboard() {
 
 
 /* ========================================
-ESCAPE HTML
+   HTML ESCAPE
 ======================================== */
 
 function escapeHTML(value) {
 
-  const div =
-    document.createElement("div");
+  return String(value)
 
-  div.textContent =
-    value ?? "";
+    .replace(
+      /&/g,
+      "&amp;"
+    )
 
-  return div.innerHTML;
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
 
 }
 
 
 /* ========================================
-CURRENT YEAR
+   CURRENT YEAR
 ======================================== */
 
 const year =
   document.getElementById("year");
+
 
 if (year) {
 
@@ -296,11 +554,4 @@ if (year) {
     new Date().getFullYear();
 
 }
-
-
-/* ========================================
-LOAD LEADERBOARD
-======================================== */
-
-loadLeaderboard();
 

@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
-
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,19 +18,42 @@
 
 <body>
 
-  <!-- ===== Header / Navigation ===== -->
+  <!-- ========================================
+       HEADER / NAVIGATION
+  ========================================= -->
 
   <header class="site-header">
+
     <nav class="nav" aria-label="Main navigation">
 
-      <a href="#top" class="nav__logo" aria-label="Game Hub home">
+      <a
+        href="#top"
+        class="nav__logo"
+        aria-label="Game Hub home"
+      >
         CHgames
       </a>
 
       <ul class="nav__links">
+
         <li>
-          <a href="#arcade">Arcade</a>
+          <a href="#arcade">
+            Arcade
+          </a>
         </li>
+
+        <li>
+          <button
+            id="leaderboardButton"
+            class="nav__leaderboard-button"
+            type="button"
+            aria-controls="leaderboardPanel"
+            aria-expanded="false"
+          >
+            Leaderboard
+          </button>
+        </li>
+
       </ul>
 
       <button
@@ -44,14 +67,109 @@
       </button>
 
     </nav>
+
   </header>
 
 
+  <!-- ========================================
+       LEADERBOARD OVERLAY
+  ========================================= -->
+
+  <div
+    id="leaderboardOverlay"
+    class="leaderboard-overlay"
+    hidden
+  ></div>
+
+
+  <!-- ========================================
+       LEADERBOARD PANEL
+  ========================================= -->
+
+  <aside
+    id="leaderboardPanel"
+    class="leaderboard-panel"
+    aria-label="Leaderboard"
+    aria-hidden="true"
+  >
+
+    <div class="leaderboard-panel__header">
+
+      <div>
+
+        <p class="leaderboard-panel__eyebrow">
+          Rankings
+        </p>
+
+        <h2>
+          Leaderboard
+        </h2>
+
+      </div>
+
+      <button
+        id="closeLeaderboard"
+        class="leaderboard-panel__close"
+        type="button"
+        aria-label="Close leaderboard"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="leaderboard-panel__description">
+
+      <p>
+        Top players ranked by total wins.
+      </p>
+
+    </div>
+
+
+    <div class="leaderboard-panel__columns">
+
+      <span>
+        PLAYER
+      </span>
+
+      <span>
+        WINS
+      </span>
+
+    </div>
+
+
+    <div
+      id="leaderboardList"
+      class="leaderboard-panel__list"
+    >
+
+      <div class="leaderboard__loading">
+        Loading leaderboard...
+      </div>
+
+    </div>
+
+  </aside>
+
+
+  <!-- ========================================
+       MAIN
+  ========================================= -->
+
   <main>
 
-    <!-- ===== Hero ===== -->
+    <!-- ========================================
+         HERO
+    ========================================= -->
 
-    <section id="top" class="hero" aria-labelledby="hero-title">
+    <section
+      id="top"
+      class="hero"
+      aria-labelledby="hero-title"
+    >
 
       <div class="hero__content">
 
@@ -59,7 +177,10 @@
           Game Hub
         </p>
 
-        <h1 id="hero-title" class="hero__name">
+        <h1
+          id="hero-title"
+          class="hero__name"
+        >
           Play.
           <br />
           Have Fun.
@@ -70,9 +191,14 @@
         </p>
 
         <div class="hero__actions">
-          <a href="#games" class="btn btn--ghost">
+
+          <a
+            href="#games"
+            class="btn btn--ghost"
+          >
             Browse Games
           </a>
+
         </div>
 
       </div>
@@ -80,7 +206,9 @@
     </section>
 
 
-    <!-- ===== Games ===== -->
+    <!-- ========================================
+         GAMES
+    ========================================= -->
 
     <section
       id="games"
@@ -94,18 +222,23 @@
           Collection
         </p>
 
-        <h2 id="games-title" class="section__title">
+        <h2
+          id="games-title"
+          class="section__title"
+        >
           Games
         </h2>
 
       </header>
 
 
-      <!-- ===== Game List ===== -->
+      <!-- GAME LIST -->
 
       <div id="gameList">
 
-        <!-- ===== Arcade Games ===== -->
+        <!-- ========================================
+             ARCADE
+        ========================================= -->
 
         <section
           id="arcade"
@@ -114,131 +247,86 @@
         >
 
           <header class="category__header">
-            <span class="category__number">01</span>
+
+            <span class="category__number">
+              01
+            </span>
 
             <h3 id="arcade-title">
               Arcade
             </h3>
+
           </header>
 
 
-          <!-- ===== Games + Leaderboard ===== -->
+          <div class="game-grid">
 
-          <div class="games-and-leaderboard">
+            <!-- CHESS -->
 
-            <!-- ===== Game Cards ===== -->
-
-            <div class="game-grid">
-
-              <!-- ===== Chess ===== -->
-
-              <button
-                id="chessGameButton"
-                class="game-card"
-                type="button"
-              >
-
-                <span class="game-card__number">
-                  01
-                </span>
-
-                <div>
-
-                  <h4>
-                    Chess
-                  </h4>
-
-                  <p>
-                    Simple, play against bots of different difficulties.
-                  </p>
-
-                </div>
-
-                <span
-                  class="game-card__arrow"
-                  aria-hidden="true"
-                >
-                  →
-                </span>
-
-              </button>
-
-
-              <!-- ===== Tic-Tac-Toe ===== -->
-
-              <button
-                id="ticTacToeGameButton"
-                class="game-card"
-                type="button"
-              >
-
-                <span class="game-card__number">
-                  02
-                </span>
-
-                <div>
-
-                  <h4>
-                    Tic-Tac-Toe
-                  </h4>
-
-                  <p>
-                    Play Tic-Tac-Toe against a bot.
-                  </p>
-
-                </div>
-
-                <span
-                  class="game-card__arrow"
-                  aria-hidden="true"
-                >
-                  →
-                </span>
-
-              </button>
-
-            </div>
-
-
-            <!-- ===== Leaderboard ===== -->
-
-            <aside
-              id="leaderboard"
-              class="leaderboard"
-              aria-labelledby="leaderboard-title"
+            <button
+              id="chessGameButton"
+              class="game-card"
+              type="button"
             >
 
-              <div class="leaderboard__header">
+              <span class="game-card__number">
+                01
+              </span>
 
-                <p class="leaderboard__eyebrow">
-                  Rankings
+              <div>
+
+                <h4>
+                  Chess
+                </h4>
+
+                <p>
+                  Simple, play against bots of different difficulties.
                 </p>
 
-                <h3 id="leaderboard-title">
-                  Leaderboard
-                </h3>
-
               </div>
 
-
-              <div class="leaderboard__columns">
-                <span>PLAYER</span>
-                <span>WINS</span>
-              </div>
-
-
-              <div
-                id="leaderboardList"
-                class="leaderboard__list"
+              <span
+                class="game-card__arrow"
+                aria-hidden="true"
               >
+                →
+              </span>
 
-                <div class="leaderboard__loading">
-                  Loading leaderboard...
-                </div>
+            </button>
+
+
+            <!-- TIC-TAC-TOE -->
+
+            <button
+              id="ticTacToeGameButton"
+              class="game-card"
+              type="button"
+            >
+
+              <span class="game-card__number">
+                02
+              </span>
+
+              <div>
+
+                <h4>
+                  Tic-Tac-Toe
+                </h4>
+
+                <p>
+                  Play Tic-Tac-Toe against a bot.
+                </p>
 
               </div>
 
-            </aside>
+              <span
+                class="game-card__arrow"
+                aria-hidden="true"
+              >
+                →
+              </span>
+
+            </button>
 
           </div>
 
@@ -258,8 +346,6 @@
         hidden
       >
 
-        <!-- ===== Back Button ===== -->
-
         <button
           id="backToGames"
           class="back-button"
@@ -268,8 +354,6 @@
           ← Back to Games
         </button>
 
-
-        <!-- ===== Game Header ===== -->
 
         <header class="game-screen__header">
 
@@ -286,8 +370,6 @@
 
         </header>
 
-
-        <!-- ===== Game ===== -->
 
         <div class="game-container">
 
@@ -307,18 +389,20 @@
   </main>
 
 
-  <!-- ===== Footer ===== -->
+  <!-- ========================================
+       FOOTER
+  ========================================= -->
 
   <footer class="site-footer">
 
     <p>
-      &copy; <span id="year"></span> CHgames Game Hub.
+      &copy;
+      <span id="year"></span>
+      CHgames Game Hub.
     </p>
 
   </footer>
 
-
-  <!-- IMPORTANT: type="module" -->
 
   <script
     type="module"

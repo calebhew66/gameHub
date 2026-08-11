@@ -165,7 +165,8 @@ NAVIGATION
   list-style: none;
 }
 
-.nav__links a {
+.nav__links a,
+.nav__leaderboard-button {
   position: relative;
 
   color: var(--text);
@@ -176,7 +177,16 @@ NAVIGATION
   font-weight: 600;
 }
 
-.nav__links a::after {
+.nav__leaderboard-button {
+  border: none;
+
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.nav__links a::after,
+.nav__leaderboard-button::after {
   content: "";
 
   position: absolute;
@@ -192,7 +202,8 @@ NAVIGATION
   transition: width 0.2s ease;
 }
 
-.nav__links a:hover::after {
+.nav__links a:hover::after,
+.nav__leaderboard-button:hover::after {
   width: 100%;
 }
 
@@ -221,6 +232,300 @@ THEME TOGGLE
 
 .nav__theme-toggle:hover {
   border-color: var(--text);
+}
+
+
+/* ========================================
+LEADERBOARD OVERLAY
+======================================== */
+
+.leaderboard-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 900;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  backdrop-filter: blur(2px);
+
+  opacity: 0;
+
+  transition: opacity 0.3s ease;
+}
+
+.leaderboard-overlay:not([hidden]) {
+  opacity: 1;
+}
+
+
+/* ========================================
+LEADERBOARD PANEL
+======================================== */
+
+.leaderboard-panel {
+  position: fixed;
+
+  top: 0;
+  right: 0;
+
+  z-index: 1000;
+
+  width: min(420px, 90vw);
+
+  height: 100vh;
+
+  overflow-y: auto;
+
+  background: var(--background);
+
+  border-left: 1px solid var(--border);
+
+  box-shadow:
+    -15px 0 40px rgba(0, 0, 0, 0.12);
+
+  transform: translateX(100%);
+
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.leaderboard-panel.is-open {
+  transform: translateX(0);
+}
+
+
+/* ========================================
+LEADERBOARD HEADER
+======================================== */
+
+.leaderboard-panel__header {
+  min-height: 100px;
+
+  padding: 25px 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.leaderboard-panel__eyebrow {
+  margin-bottom: 6px;
+
+  color: var(--muted);
+
+  font-size: 0.7rem;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.15em;
+}
+
+.leaderboard-panel__header h2 {
+  color: var(--text);
+
+  font-size: 2rem;
+
+  line-height: 1;
+
+  letter-spacing: -0.04em;
+}
+
+
+/* ========================================
+CLOSE BUTTON
+======================================== */
+
+.leaderboard-panel__close {
+  width: 42px;
+  height: 42px;
+
+  border: 1px solid var(--border);
+
+  background: var(--surface);
+  color: var(--text);
+
+  cursor: pointer;
+
+  font-size: 1.7rem;
+  font-weight: 300;
+
+  line-height: 1;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.leaderboard-panel__close:hover {
+  border-color: var(--text);
+
+  background: var(--text);
+
+  color: var(--background);
+}
+
+
+/* ========================================
+DESCRIPTION
+======================================== */
+
+.leaderboard-panel__description {
+  padding: 25px 30px;
+
+  color: var(--muted);
+
+  font-size: 0.85rem;
+
+  border-bottom: 1px solid var(--border);
+}
+
+
+/* ========================================
+COLUMNS
+======================================== */
+
+.leaderboard-panel__columns {
+  padding: 12px 30px;
+
+  display: grid;
+
+  grid-template-columns: 1fr auto;
+
+  border-bottom: 1px solid var(--border);
+
+  color: var(--muted);
+
+  font-family: monospace;
+
+  font-size: 0.65rem;
+}
+
+
+/* ========================================
+LIST
+======================================== */
+
+.leaderboard-panel__list {
+  width: 100%;
+}
+
+
+/* ========================================
+PLAYER
+======================================== */
+
+.leaderboard__player {
+  padding: 20px 30px;
+
+  display: grid;
+
+  grid-template-columns: 40px 1fr auto;
+
+  gap: 15px;
+
+  align-items: center;
+
+  border-bottom: 1px solid var(--border);
+
+  transition:
+    background-color 0.2s ease;
+}
+
+.leaderboard__player:hover {
+  background: var(--surface);
+}
+
+.leaderboard__rank {
+  color: var(--muted);
+
+  font-family: monospace;
+
+  font-size: 0.8rem;
+}
+
+.leaderboard__player-name {
+  min-width: 0;
+
+  overflow: hidden;
+
+  color: var(--text);
+
+  font-size: 1rem;
+  font-weight: 700;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.leaderboard__games {
+  margin-top: 4px;
+
+  color: var(--muted);
+
+  font-size: 0.7rem;
+}
+
+.leaderboard__total {
+  color: var(--text);
+
+  font-size: 1.2rem;
+  font-weight: 800;
+
+  text-align: right;
+}
+
+.leaderboard__total-label {
+  display: block;
+
+  color: var(--muted);
+
+  font-size: 0.6rem;
+  font-weight: 500;
+}
+
+
+/* ========================================
+TOP 3
+======================================== */
+
+.leaderboard__player.rank-1 .leaderboard__rank {
+  color: #c99700;
+  font-weight: 800;
+}
+
+.leaderboard__player.rank-2 .leaderboard__rank {
+  color: #8c8c8c;
+  font-weight: 800;
+}
+
+.leaderboard__player.rank-3 .leaderboard__rank {
+  color: #a86f3d;
+  font-weight: 800;
+}
+
+
+/* ========================================
+LEADERBOARD STATES
+======================================== */
+
+.leaderboard__loading,
+.leaderboard__empty,
+.leaderboard__error {
+  padding: 30px;
+
+  color: var(--muted);
+
+  font-size: 0.85rem;
+}
+
+.leaderboard__error {
+  color: var(--text);
 }
 
 
@@ -401,30 +706,15 @@ GAME CATEGORY
 
 
 /* ========================================
-GAMES + LEADERBOARD
-======================================== */
-
-.games-and-leaderboard {
-  margin-left: 140px;
-
-  display: grid;
-
-  grid-template-columns: minmax(0, 1fr) 310px;
-
-  gap: 30px;
-
-  align-items: start;
-}
-
-
-/* ========================================
 GAME GRID
 ======================================== */
 
 .game-grid {
+  margin-left: 140px;
+
   display: grid;
 
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, 1fr);
 
   gap: 15px;
 }
@@ -513,162 +803,6 @@ GAME CARD
 
 
 /* ========================================
-LEADERBOARD
-======================================== */
-
-.leaderboard {
-  width: 100%;
-
-  border: 1px solid var(--border);
-
-  background: var(--surface);
-}
-
-.leaderboard__header {
-  padding: 25px;
-
-  border-bottom: 1px solid var(--border);
-}
-
-.leaderboard__eyebrow {
-  margin-bottom: 6px;
-
-  color: var(--muted);
-
-  font-size: 0.7rem;
-  font-weight: 700;
-
-  text-transform: uppercase;
-
-  letter-spacing: 0.15em;
-}
-
-.leaderboard__header h3 {
-  color: var(--text);
-
-  font-size: 1.5rem;
-
-  line-height: 1;
-}
-
-.leaderboard__columns {
-  padding: 12px 20px;
-
-  display: grid;
-
-  grid-template-columns: 1fr auto;
-
-  border-bottom: 1px solid var(--border);
-
-  color: var(--muted);
-
-  font-family: monospace;
-
-  font-size: 0.65rem;
-}
-
-.leaderboard__list {
-  width: 100%;
-}
-
-.leaderboard__player {
-  padding: 17px 20px;
-
-  display: grid;
-
-  grid-template-columns: 32px 1fr auto;
-
-  gap: 10px;
-
-  align-items: center;
-
-  border-bottom: 1px solid var(--border);
-}
-
-.leaderboard__player:last-child {
-  border-bottom: none;
-}
-
-.leaderboard__rank {
-  color: var(--muted);
-
-  font-family: monospace;
-
-  font-size: 0.75rem;
-}
-
-.leaderboard__player-name {
-  min-width: 0;
-
-  overflow: hidden;
-
-  color: var(--text);
-
-  font-size: 0.9rem;
-  font-weight: 700;
-
-  text-overflow: ellipsis;
-
-  white-space: nowrap;
-}
-
-.leaderboard__games {
-  margin-top: 3px;
-
-  color: var(--muted);
-
-  font-size: 0.68rem;
-}
-
-.leaderboard__total {
-  color: var(--text);
-
-  font-size: 1rem;
-  font-weight: 800;
-
-  text-align: right;
-}
-
-.leaderboard__total-label {
-  display: block;
-
-  color: var(--muted);
-
-  font-size: 0.6rem;
-  font-weight: 500;
-}
-
-.leaderboard__player.rank-1 .leaderboard__rank {
-  color: #c99700;
-  font-weight: 800;
-}
-
-.leaderboard__player.rank-2 .leaderboard__rank {
-  color: #8c8c8c;
-  font-weight: 800;
-}
-
-.leaderboard__player.rank-3 .leaderboard__rank {
-  color: #a86f3d;
-  font-weight: 800;
-}
-
-.leaderboard__loading,
-.leaderboard__empty,
-.leaderboard__error {
-  padding: 25px 20px;
-
-  color: var(--muted);
-
-  font-size: 0.8rem;
-}
-
-.leaderboard__error {
-  color: var(--text);
-}
-
-
-/* ========================================
 GAME SCREEN
 ======================================== */
 
@@ -694,7 +828,7 @@ GAME SCREEN
 
 
 /* ========================================
-BACK TO GAMES
+BACK BUTTON
 ======================================== */
 
 .back-button {
@@ -792,19 +926,8 @@ ACCESSIBILITY
 
 
 /* ========================================
-TABLET / MOBILE
+MOBILE
 ======================================== */
-
-@media (max-width: 900px) {
-
-  .games-and-leaderboard {
-    margin-left: 0;
-
-    grid-template-columns: 1fr 280px;
-  }
-
-}
-
 
 @media (max-width: 700px) {
 
@@ -818,7 +941,8 @@ TABLET / MOBILE
     gap: 15px;
   }
 
-  .nav__links a {
+  .nav__links a,
+  .nav__leaderboard-button {
     font-size: 0.7rem;
   }
 
@@ -844,15 +968,9 @@ TABLET / MOBILE
     gap: 10px;
   }
 
-  .games-and-leaderboard {
+  .game-grid {
     margin-left: 0;
 
-    grid-template-columns: 1fr;
-
-    gap: 40px;
-  }
-
-  .game-grid {
     grid-template-columns: 1fr;
   }
 
@@ -868,13 +986,22 @@ TABLET / MOBILE
     margin-bottom: 40px;
   }
 
+  .leaderboard-panel {
+    width: min(380px, 92vw);
+  }
+
 }
 
 
 @media (max-width: 450px) {
 
   .nav__links {
-    display: none;
+    gap: 10px;
+  }
+
+  .nav__links a,
+  .nav__leaderboard-button {
+    font-size: 0.65rem;
   }
 
   .hero__name {
@@ -891,6 +1018,22 @@ TABLET / MOBILE
 
   .game-frame {
     height: 500px;
+  }
+
+  .leaderboard-panel__header {
+    padding: 20px;
+  }
+
+  .leaderboard-panel__description {
+    padding: 20px;
+  }
+
+  .leaderboard-panel__columns {
+    padding: 12px 20px;
+  }
+
+  .leaderboard__player {
+    padding: 18px 20px;
   }
 
 }
