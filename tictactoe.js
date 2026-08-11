@@ -1,33 +1,33 @@
-
-"use strict";
-
-// ============================================================
-// TIC-TAC-TOE
-// ============================================================
-
 const cells = document.querySelectorAll(".cell");
 const statusText = document.getElementById("status");
 const restartButton = document.getElementById("restart");
 
+console.log("Tic-Tac-Toe loaded.");
+console.log("Number of cells found:", cells.length);
+
+let board = ["", "", "", "", "", "", "", ""];
+
 const PLAYER = "X";
 const BOT = "O";
 
-let board = ["", "", "", "", "", "", "", ""];
 let gameOver = false;
 let botThinking = false;
 let winRecorded = false;
 
 const winningCombinations = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
+[0, 1, 2],
+[3, 4, 5],
+[6, 7, 8],
 
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
 
-    [0, 4, 8],
-    [2, 4, 6]
+[0, 3, 6],
+[1, 4, 7],
+[2, 5, 8],
+
+[0, 4, 8],
+[2, 4, 6]
+
+
 ];
 
 // ============================================================
@@ -35,25 +35,36 @@ const winningCombinations = [
 // ============================================================
 
 function getUsername() {
-    let username = localStorage.getItem("chgames_username");
+
+
+let username =
+    localStorage.getItem("chgames_username");
+
+if (!username) {
+
+    username =
+        prompt("Enter your CHgames username:");
 
     if (!username) {
-        username = prompt("Enter your CHgames username:");
-
-        if (!username) {
-            username = "Player";
-        }
-
-        username = username.trim().slice(0, 20);
-
-        if (!username) {
-            username = "Player";
-        }
-
-        localStorage.setItem("chgames_username", username);
+        username = "Player";
     }
 
-    return username;
+    username =
+        username.trim().slice(0, 20);
+
+    if (!username) {
+        username = "Player";
+    }
+
+    localStorage.setItem(
+        "chgames_username",
+        username
+    );
+}
+
+return username;
+
+
 }
 
 // ============================================================
@@ -61,143 +72,251 @@ function getUsername() {
 // ============================================================
 
 async function recordTicTacToeWin() {
-    if (winRecorded) {
+
+
+if (winRecorded) {
+    return;
+}
+
+winRecorded = true;
+
+try {
+
+    const {
+        createClient
+    } = await import("./lib/supabase.js");
+
+    const supabase = createClient();
+
+    const username = getUsername();
+
+    const {
+        data: existingPlayer,
+        error: selectError
+    } = await supabase
+        .from("player_stats")
+        .select(
+            "id, username, checkers_wins, tictactoe_wins"
+        )
+        .eq("username", username)
+        .maybeSingle();
+
+    if (selectError) {
+
+        console.error(
+            "Error finding player:",
+            selectError
+        );
+
+        winRecorded = false;
         return;
     }
 
-    winRecorded = true;
+    if (existingPlayer) {
 
-    try {
-        const { createClient } =
-            await import("./lib/supabase.js");
+        const checkersWins =
+            Number(
+                existingPlayer.checkers_wins || 0
+            );
 
-        const supabase = createClient();
+        const ticTacToeWins =
+            Number(
+                existingPlayer.tictactoe_wins || 0
+            ) + 1;
 
-        const username = getUsername();
+        const totalWins =
+            checkersWins + ticTacToeWins;
 
         const {
-            data: existingPlayer,
-            error: selectError
+            error: updateError
         } = await supabase
             .from("player_stats")
-            .select(
-                "id, username, checkers_wins, tictactoe_wins"
-            )
-            .eq("username", username)
-            .maybeSingle();
+            .update({
+                tictactoe_wins: ticTacToeWins,
+                total_wins: totalWins
+            })
+            .eq(
+                "id",
+                existingPlayer.id
+            );
 
-        if (selectError) {
+        if (updateError) {
+
             console.error(
-                "Error finding player:",
-                selectError
+                "Error updating Tic-Tac-Toe wins:",
+                updateError
             );
 
             winRecorded = false;
             return;
         }
 
-        if (existingPlayer) {
-            const checkersWins =
-                Number(existingPlayer.checkers_wins || 0);
-
-            const ticTacToeWins =
-                Number(existingPlayer.tictactoe_wins || 0) + 1;
-
-            const totalWins =
-                checkersWins + ticTacToeWins;
-
-            const { error: updateError } =
-                await supabase
-                    .from("player_stats")
-                    .update({
-                        tictactoe_wins: ticTacToeWins,
-                        total_wins: totalWins
-                    })
-                    .eq("id", existingPlayer.id);
-
-            if (updateError) {
-                console.error(
-                    "Error updating Tic-Tac-Toe wins:",
-                    updateError
-                );
-
-                winRecorded = false;
-                return;
-            }
-
-            console.log(
-                "Tic-Tac-Toe win recorded!"
-            );
-
-        } else {
-            const { error: insertError } =
-                await supabase
-                    .from("player_stats")
-                    .insert({
-                        username: username,
-                        checkers_wins: 0,
-                        tictactoe_wins: 1,
-                        total_wins: 1
-                    });
-
-            if (insertError) {
-                console.error(
-                    "Error creating player:",
-                    insertError
-                );
-
-                winRecorded = false;
-                return;
-            }
-
-            console.log(
-                "Player created and Tic-Tac-Toe win recorded!"
-            );
-        }
-
-    } catch (error) {
-        console.error(
-            "Supabase error:",
-            error
+        console.log(
+            "Tic-Tac-Toe win recorded!"
         );
 
-        winRecorded = false;
+    } else {
+
+        const {
+            error: insertError
+        } = await supabase
+            .from("player_stats")
+            .insert({
+                username: username,
+                checkers_wins: 0,
+                tictactoe_wins: 1,
+                total_wins: 1
+            });
+
+        if (insertError) {
+
+            console.error(
+                "Error creating player:",
+                insertError
+            );
+
+            winRecorded = false;
+            return;
+        }
+
+        console.log(
+            "Player created and Tic-Tac-Toe win recorded!"
+        );
     }
+
+} catch (error) {
+
+    console.error(
+        "Supabase error:",
+        error
+    );
+
+    winRecorded = false;
+}
+
+
 }
 
 // ============================================================
-// PLAYER CLICK
+// MAKE MOVE
+// ============================================================
+
+function makeMove(index, player) {
+
+
+console.log(
+    "Making move:",
+    index,
+    player
+);
+
+if (
+    index < 0 ||
+    index > 8
+) {
+    console.error(
+        "Invalid cell index:",
+        index
+    );
+    return false;
+}
+
+if (
+    board[index] !== ""
+) {
+    console.log(
+        "Cell already occupied:",
+        index
+    );
+    return false;
+}
+
+board[index] = player;
+
+cells[index].textContent = player;
+
+cells[index].classList.remove(
+    "x",
+    "o"
+);
+
+cells[index].classList.add(
+    player.toLowerCase()
+);
+
+cells[index].disabled = true;
+
+console.log(
+    "Board after move:",
+    board
+);
+
+return true;
+
+
+}
+
+// ============================================================
+// PLAYER MOVE
 // ============================================================
 
 cells.forEach((cell) => {
 
-    cell.addEventListener("click", () => {
+
+cell.addEventListener(
+    "click",
+    () => {
+
+        const index =
+            Number(
+                cell.dataset.index
+            );
 
         console.log(
             "Clicked cell:",
-            cell.dataset.index
+            index
         );
 
-        if (gameOver || botThinking) {
+        if (
+            gameOver ||
+            botThinking
+        ) {
+            console.log(
+                "Click ignored because game is busy."
+            );
             return;
         }
-
-        const index =
-            Number(cell.dataset.index);
 
         if (
-            index < 0 ||
-            index > 8 ||
             board[index] !== ""
         ) {
+            console.log(
+                "Cell already occupied."
+            );
             return;
         }
 
-        // PLAYER MOVE
-        makeMove(index, PLAYER);
+        const moveWorked =
+            makeMove(
+                index,
+                PLAYER
+            );
 
-        // PLAYER WIN
-        if (checkWinner(board, PLAYER)) {
+        if (!moveWorked) {
+            return;
+        }
+
+
+        // ========================================
+        // PLAYER WON
+        // ========================================
+
+        if (
+            checkWinner(
+                board,
+                PLAYER
+            )
+        ) {
 
             statusText.textContent =
                 "You win! 🎉";
@@ -209,8 +328,14 @@ cells.forEach((cell) => {
             return;
         }
 
+
+        // ========================================
         // DRAW
-        if (isBoardFull(board)) {
+        // ========================================
+
+        if (
+            isBoardFull(board)
+        ) {
 
             statusText.textContent =
                 "It's a draw! 🤝";
@@ -220,61 +345,25 @@ cells.forEach((cell) => {
             return;
         }
 
+
+        // ========================================
         // BOT TURN
+        // ========================================
+
         botThinking = true;
 
         statusText.textContent =
             "Bot is thinking...";
 
-        setTimeout(() => {
-            botMove();
-        }, 400);
+        setTimeout(
+            botMove,
+            400
+        );
+    }
+);
 
-    });
 
 });
-
-// ============================================================
-// MAKE MOVE
-// ============================================================
-
-function makeMove(index, player) {
-
-    if (
-        index < 0 ||
-        index > 8
-    ) {
-        return;
-    }
-
-    if (board[index] !== "") {
-        return;
-    }
-
-    board[index] = player;
-
-    cells[index].textContent = player;
-
-    cells[index].classList.remove(
-        "x",
-        "o"
-    );
-
-    cells[index].classList.add(
-        player.toLowerCase()
-    );
-
-    cells[index].disabled = true;
-
-    console.log(
-        `${player} placed at cell ${index}`
-    );
-
-    console.log(
-        "Current board:",
-        board
-    );
-}
 
 // ============================================================
 // BOT MOVE
@@ -282,55 +371,77 @@ function makeMove(index, player) {
 
 function botMove() {
 
-    if (gameOver) {
-        return;
-    }
 
-    const bestMove = getBestMove();
+if (gameOver) {
+    return;
+}
 
-    console.log(
-        "Bot chose cell:",
-        bestMove
-    );
+const bestMove =
+    getBestMove();
 
-    if (bestMove === -1) {
-        botThinking = false;
-        return;
-    }
+console.log(
+    "Bot selected:",
+    bestMove
+);
+
+if (
+    bestMove !== -1
+) {
 
     makeMove(
         bestMove,
         BOT
     );
+}
 
-    // BOT WIN
-    if (checkWinner(board, BOT)) {
 
-        statusText.textContent =
-            "The bot wins! 🤖";
+// ========================================
+// BOT WON
+// ========================================
 
-        gameOver = true;
-        botThinking = false;
+if (
+    checkWinner(
+        board,
+        BOT
+    )
+) {
 
-        return;
-    }
+    statusText.textContent =
+        "The bot wins! 🤖";
 
-    // DRAW
-    if (isBoardFull(board)) {
-
-        statusText.textContent =
-            "It's a draw! 🤝";
-
-        gameOver = true;
-        botThinking = false;
-
-        return;
-    }
+    gameOver = true;
 
     botThinking = false;
 
+    return;
+}
+
+
+// ========================================
+// DRAW
+// ========================================
+
+if (
+    isBoardFull(board)
+) {
+
     statusText.textContent =
-        "Your turn — You are X";
+        "It's a draw! 🤝";
+
+    gameOver = true;
+
+    botThinking = false;
+
+    return;
+}
+
+
+botThinking = false;
+
+statusText.textContent =
+    "Your turn — You are X";
+
+
 }
 
 // ============================================================
@@ -339,139 +450,197 @@ function botMove() {
 
 function getBestMove() {
 
-    // --------------------------------------------------------
-    // 1. BOT CAN WIN
-    // --------------------------------------------------------
 
-    for (let i = 0; i < 9; i++) {
+// ========================================
+// 1. BOT CAN WIN
+// ========================================
 
-        if (board[i] === "") {
+for (
+    let i = 0;
+    i < 9;
+    i++
+) {
 
-            board[i] = BOT;
+    if (
+        board[i] === ""
+    ) {
 
-            if (checkWinner(board, BOT)) {
-                board[i] = "";
-                return i;
-            }
+        board[i] = BOT;
 
-            board[i] = "";
-        }
-    }
-
-    // --------------------------------------------------------
-    // 2. BLOCK PLAYER
-    // --------------------------------------------------------
-
-    for (let i = 0; i < 9; i++) {
-
-        if (board[i] === "") {
-
-            board[i] = PLAYER;
-
-            if (checkWinner(board, PLAYER)) {
-                board[i] = "";
-                return i;
-            }
+        if (
+            checkWinner(
+                board,
+                BOT
+            )
+        ) {
 
             board[i] = "";
+
+            return i;
         }
+
+        board[i] = "";
     }
+}
 
-    // --------------------------------------------------------
-    // 3. CENTER
-    // --------------------------------------------------------
 
-    if (board[4] === "") {
-        return 4;
+// ========================================
+// 2. BLOCK PLAYER
+// ========================================
+
+for (
+    let i = 0;
+    i < 9;
+    i++
+) {
+
+    if (
+        board[i] === ""
+    ) {
+
+        board[i] = PLAYER;
+
+        if (
+            checkWinner(
+                board,
+                PLAYER
+            )
+        ) {
+
+            board[i] = "";
+
+            return i;
+        }
+
+        board[i] = "";
     }
+}
 
-    // --------------------------------------------------------
-    // 4. CORNERS
-    // --------------------------------------------------------
 
-    const corners = [
-        0,
-        2,
-        6,
-        8
+// ========================================
+// 3. CENTER
+// ========================================
+
+if (
+    board[4] === ""
+) {
+
+    return 4;
+}
+
+
+// ========================================
+// 4. CORNERS
+// ========================================
+
+const corners = [
+    0,
+    2,
+    6,
+    8
+];
+
+const availableCorners =
+    corners.filter(
+        (index) =>
+            board[index] === ""
+    );
+
+if (
+    availableCorners.length > 0
+) {
+
+    return availableCorners[
+        Math.floor(
+            Math.random() *
+            availableCorners.length
+        )
     ];
+}
 
-    const availableCorners =
-        corners.filter(
-            (index) =>
-                board[index] === ""
-        );
 
-    if (availableCorners.length > 0) {
+// ========================================
+// 5. ANY AVAILABLE SPACE
+// ========================================
 
-        return availableCorners[
-            Math.floor(
-                Math.random() *
-                availableCorners.length
-            )
-        ];
+const availableSpaces = [];
+
+for (
+    let i = 0;
+    i < 9;
+    i++
+) {
+
+    if (
+        board[i] === ""
+    ) {
+
+        availableSpaces.push(i);
     }
+}
 
-    // --------------------------------------------------------
-    // 5. ANY REMAINING SPACE
-    // --------------------------------------------------------
+if (
+    availableSpaces.length > 0
+) {
 
-    const availableSpaces = [];
+    return availableSpaces[
+        Math.floor(
+            Math.random() *
+            availableSpaces.length
+        )
+    ];
+}
 
-    for (let i = 0; i < 9; i++) {
+return -1;
 
-        if (board[i] === "") {
-            availableSpaces.push(i);
-        }
-    }
 
-    if (availableSpaces.length > 0) {
-
-        return availableSpaces[
-            Math.floor(
-                Math.random() *
-                availableSpaces.length
-            )
-        ];
-    }
-
-    return -1;
 }
 
 // ============================================================
 // CHECK WINNER
 // ============================================================
 
-function checkWinner(currentBoard, player) {
+function checkWinner(
+currentBoard,
+player
+) {
 
-    return winningCombinations.some(
-        (combination) => {
 
-            const [
-                a,
-                b,
-                c
-            ] = combination;
+return winningCombinations.some(
+    (combination) => {
 
-            return (
-                currentBoard[a] === player &&
-                currentBoard[b] === player &&
-                currentBoard[c] === player
-            );
-        }
-    );
+        const [
+            a,
+            b,
+            c
+        ] = combination;
+
+        return (
+            currentBoard[a] === player &&
+            currentBoard[b] === player &&
+            currentBoard[c] === player
+        );
+    }
+);
+
+
 }
 
 // ============================================================
 // CHECK DRAW
 // ============================================================
 
-function isBoardFull(currentBoard) {
+function isBoardFull(
+currentBoard
+) {
 
-    return currentBoard.every(
-        (square) =>
-            square !== ""
-    );
+
+return currentBoard.every(
+    (square) =>
+        square !== ""
+);
+
+
 }
 
 // ============================================================
@@ -479,55 +648,50 @@ function isBoardFull(currentBoard) {
 // ============================================================
 
 restartButton.addEventListener(
-    "click",
-    restartGame
+"click",
+restartGame
 );
 
 function restartGame() {
 
-    board = [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""
-    ];
 
-    gameOver = false;
-    botThinking = false;
-    winRecorded = false;
+board = [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+];
 
-    cells.forEach(
-        (cell) => {
+gameOver = false;
 
-            cell.textContent = "";
+botThinking = false;
 
-            cell.classList.remove(
-                "x",
-                "o"
-            );
+winRecorded = false;
 
-            cell.disabled = false;
-        }
-    );
+cells.forEach(
+    (cell) => {
 
-    statusText.textContent =
-        "Your turn — You are X";
+        cell.textContent = "";
+
+        cell.classList.remove(
+            "x",
+            "o"
+        );
+
+        cell.disabled = false;
+    }
+);
+
+statusText.textContent =
+    "Your turn — You are X";
+
+console.log(
+    "Game restarted."
+);
+
+
 }
-
-// ============================================================
-// DEBUG
-// ============================================================
-
-console.log(
-    "Tic-Tac-Toe loaded."
-);
-
-console.log(
-    "Number of cells found:",
-    cells.length
-);
-
