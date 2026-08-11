@@ -92,6 +92,7 @@ function getUsername() {
 // ============================================================
 
 
+
 async function recordTicTacToeWin() {
 
     if (winRecorded) {
@@ -102,18 +103,20 @@ async function recordTicTacToeWin() {
 
     try {
 
-        // Use the browser-compatible Supabase CDN.
         const {
             createClient
         } = await import(
             "https://esm.sh/@supabase/supabase-js@2"
         );
 
+
         const supabaseUrl =
             "https://ijtclttmxnckpieqkaki.supabase.co";
 
+
         const supabaseKey =
             "sb_publishable_ntobIYEBKNJI3tPpfD_izQ_xLJ-n7UL";
+
 
         const supabase =
             createClient(
@@ -136,7 +139,7 @@ async function recordTicTacToeWin() {
         } = await supabase
             .from("player_stats")
             .select(
-                "id, username, checkers_wins, tictactoe_wins, total_wins"
+                "id, username, checkers_wins, tictactoe_wins"
             )
             .eq(
                 "username",
@@ -164,19 +167,10 @@ async function recordTicTacToeWin() {
 
         if (existingPlayer) {
 
-            const checkersWins =
-                Number(
-                    existingPlayer.checkers_wins || 0
-                );
-
             const ticTacToeWins =
                 Number(
                     existingPlayer.tictactoe_wins || 0
                 ) + 1;
-
-            const totalWins =
-                checkersWins +
-                ticTacToeWins;
 
 
             const {
@@ -186,10 +180,7 @@ async function recordTicTacToeWin() {
                 .update({
 
                     tictactoe_wins:
-                        ticTacToeWins,
-
-                    total_wins:
-                        totalWins
+                        ticTacToeWins
 
                 })
                 .eq(
@@ -237,9 +228,6 @@ async function recordTicTacToeWin() {
                         0,
 
                     tictactoe_wins:
-                        1,
-
-                    total_wins:
                         1
 
                 });
@@ -274,6 +262,7 @@ async function recordTicTacToeWin() {
         winRecorded = false;
     }
 }
+
 
 
 
