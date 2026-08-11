@@ -562,6 +562,7 @@ function botMove() {
 // BOT AI
 // ============================================================
 
+
 function getBestMove() {
 
     // ========================================
@@ -574,9 +575,7 @@ function getBestMove() {
         i++
     ) {
 
-        if (
-            board[i] === ""
-        ) {
+        if (board[i] === "") {
 
             board[i] = BOT;
 
@@ -607,9 +606,7 @@ function getBestMove() {
         i++
     ) {
 
-        if (
-            board[i] === ""
-        ) {
+        if (board[i] === "") {
 
             board[i] = PLAYER;
 
@@ -631,7 +628,117 @@ function getBestMove() {
 
 
     // ========================================
-    // 3. CENTER
+    // 3. FORK PREVENTION
+    //
+    // If the player has opposite corners,
+    // taking the center can allow a fork.
+    //
+    // Example:
+    //
+    // X . .
+    // . O .
+    // . . X
+    //
+    // Don't blindly choose another corner.
+    // Choose a random available edge instead.
+    // ========================================
+
+    const oppositeCornerPairs = [
+        [0, 8],
+        [2, 6]
+    ];
+
+    const playerHasOppositeCorners =
+        oppositeCornerPairs.some(
+            ([a, b]) =>
+                board[a] === PLAYER &&
+                board[b] === PLAYER
+        );
+
+
+    if (
+        playerHasOppositeCorners &&
+        board[4] === BOT
+    ) {
+
+        const edges = [
+            1,
+            3,
+            5,
+            7
+        ];
+
+
+        const availableEdges =
+            edges.filter(
+                (index) =>
+                    board[index] === ""
+            );
+
+
+        if (
+            availableEdges.length > 0
+        ) {
+
+            return availableEdges[
+                Math.floor(
+                    Math.random() *
+                    availableEdges.length
+                )
+            ];
+        }
+    }
+
+
+    // ========================================
+    // 4. IF PLAYER HAS A CORNER AND CENTER
+    // IS EMPTY, DON'T ALWAYS FORCE CENTER
+    // ========================================
+
+    const playerHasCorner =
+        [0, 2, 6, 8].some(
+            (index) =>
+                board[index] === PLAYER
+        );
+
+
+    if (
+        playerHasCorner &&
+        board[4] === ""
+    ) {
+
+        // Usually center is still a good move,
+        // but randomize between center and edges
+        // so the bot isn't completely predictable.
+
+        const safeChoices = [
+            4,
+            1,
+            3,
+            5,
+            7
+        ].filter(
+            (index) =>
+                board[index] === ""
+        );
+
+
+        if (
+            safeChoices.length > 0
+        ) {
+
+            return safeChoices[
+                Math.floor(
+                    Math.random() *
+                    safeChoices.length
+                )
+            ];
+        }
+    }
+
+
+    // ========================================
+    // 5. CENTER
     // ========================================
 
     if (
@@ -643,7 +750,7 @@ function getBestMove() {
 
 
     // ========================================
-    // 4. CORNERS
+    // 6. RANDOM CORNER
     // ========================================
 
     const corners = [
@@ -653,11 +760,13 @@ function getBestMove() {
         8
     ];
 
+
     const availableCorners =
         corners.filter(
             (index) =>
                 board[index] === ""
         );
+
 
     if (
         availableCorners.length > 0
@@ -673,10 +782,11 @@ function getBestMove() {
 
 
     // ========================================
-    // 5. ANY AVAILABLE SPACE
+    // 7. RANDOM AVAILABLE SPACE
     // ========================================
 
     const availableSpaces = [];
+
 
     for (
         let i = 0;
@@ -692,6 +802,7 @@ function getBestMove() {
         }
     }
 
+
     if (
         availableSpaces.length > 0
     ) {
@@ -704,13 +815,10 @@ function getBestMove() {
         ];
     }
 
+
     return -1;
 }
 
-
-// ============================================================
-// CHECK WINNER
-// ============================================================
 
 function checkWinner(
     currentBoard,
