@@ -55,7 +55,7 @@
           error: selectError
         } = await supabaseClient
           .from("player_stats")
-          .select("id, username, chess_wins, tictactoe_wins")
+          .select("id, username, checkers_wins, tictactoe_wins")
           .eq("username", username)
           .maybeSingle();
   
@@ -76,8 +76,8 @@
           } = await supabaseClient
             .from("player_stats")
             .update({
-              chess_wins:
-                (existingPlayer.chess_wins || 0) + 1
+              checkers_wins:
+                (existingPlayer.checkers_wins || 0) + 1
             })
             .eq("id", existingPlayer.id);
   
@@ -104,7 +104,7 @@
             .from("player_stats")
             .insert({
               username: username,
-              chess_wins: 1,
+              checkers_wins: 1,
               tictactoe_wins: 0
             });
   

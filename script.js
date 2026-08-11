@@ -335,7 +335,7 @@ async function loadLeaderboard() {
       .from("player_stats")
 
       .select(
-        "username, chess_wins, tictactoe_wins, total_wins"
+        "username, checkers_wins, tictactoe_wins, total_wins"
       )
 
       .order(
@@ -415,7 +415,7 @@ async function loadLeaderboard() {
                     class="leaderboard__games"
                   >
                     Checkers:
-                    ${player.chess_wins}
+                    ${player.checkers_wins}
                     &nbsp;•&nbsp;
                     Tic-Tac-Toe:
                     ${player.tictactoe_wins}
