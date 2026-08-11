@@ -1,516 +1,606 @@
-
 /* ========================================
-SUPABASE
+   SUPABASE
 ======================================== */
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+    createClient
+} from "https://esm.sh/@supabase/supabase-js@2";
+
 
 const supabaseUrl =
-  "https://ijtclttmxnckpieqkaki.supabase.co";
+    "https://ijtclttmxnckpieqkaki.supabase.co";
+
 
 const supabaseKey =
-  "sb_publishable_ntobIYEBKNJI3tPpfD_izQ_xLJ-n7UL";
+    "sb_publishable_ntobIYEBKNJI3tPpfD_izQ_xLJ-n7UL";
 
-const supabase = createClient(
-  supabaseUrl,
-  supabaseKey
+
+const supabase =
+    createClient(
+        supabaseUrl,
+        supabaseKey
+    );
+
+
+/* ========================================
+   THEME TOGGLE
+======================================== */
+
+const themeToggle =
+    document.getElementById(
+        "themeToggle"
+    );
+
+
+const savedTheme =
+    localStorage.getItem(
+        "theme"
+    );
+
+
+if (
+    savedTheme === "dark"
+) {
+
+    document.body.classList.add(
+        "dark-mode"
+    );
+
+    themeToggle.textContent =
+        "○";
+
+    themeToggle.setAttribute(
+        "aria-pressed",
+        "true"
+    );
+}
+
+
+themeToggle.addEventListener(
+    "click",
+    () => {
+
+        const isDark =
+            document.body.classList.toggle(
+                "dark-mode"
+            );
+
+
+        themeToggle.textContent =
+            isDark
+                ? "○"
+                : "◐";
+
+
+        themeToggle.setAttribute(
+            "aria-pressed",
+            isDark
+                ? "true"
+                : "false"
+        );
+
+
+        localStorage.setItem(
+            "theme",
+            isDark
+                ? "dark"
+                : "light"
+        );
+
+    }
 );
 
 
 /* ========================================
-THEME TOGGLE
-======================================== */
-
-const themeToggle =
-  document.getElementById("themeToggle");
-
-const savedTheme =
-  localStorage.getItem("theme");
-
-if (savedTheme === "dark") {
-
-  document.body.classList.add("dark-mode");
-
-  themeToggle.textContent = "○";
-
-  themeToggle.setAttribute(
-    "aria-pressed",
-    "true"
-  );
-
-}
-
-themeToggle.addEventListener("click", () => {
-
-  const isDark =
-    document.body.classList.toggle("dark-mode");
-
-  themeToggle.textContent =
-    isDark ? "○" : "◐";
-
-  themeToggle.setAttribute(
-    "aria-pressed",
-    isDark ? "true" : "false"
-  );
-
-  localStorage.setItem(
-    "theme",
-    isDark ? "dark" : "light"
-  );
-
-});
-
-
-/* ========================================
-GAME ELEMENTS
+   GAME ELEMENTS
 ======================================== */
 
 const chessGameButton =
-  document.getElementById("chessGameButton");
+    document.getElementById(
+        "chessGameButton"
+    );
+
 
 const ticTacToeGameButton =
-  document.getElementById("ticTacToeGameButton");
+    document.getElementById(
+        "ticTacToeGameButton"
+    );
+
 
 const backToGames =
-  document.getElementById("backToGames");
+    document.getElementById(
+        "backToGames"
+    );
+
 
 const gameList =
-  document.getElementById("gameList");
+    document.getElementById(
+        "gameList"
+    );
+
 
 const gameScreen =
-  document.getElementById("gameScreen");
+    document.getElementById(
+        "gameScreen"
+    );
+
 
 const gameFrame =
-  document.getElementById("gameFrame");
+    document.getElementById(
+        "gameFrame"
+    );
+
 
 const gameScreenTitle =
-  document.getElementById("gameScreenTitle");
+    document.getElementById(
+        "gameScreenTitle"
+    );
 
 
 /* ========================================
-OPEN CHECKERS
+   OPEN CHECKERS
 ======================================== */
 
-chessGameButton.addEventListener("click", () => {
+chessGameButton.addEventListener(
+    "click",
+    () => {
 
-  gameList.hidden = true;
+        gameList.hidden = true;
 
-  gameScreen.hidden = false;
+        gameScreen.hidden = false;
 
-  gameScreenTitle.textContent = "Checkers";
+        gameScreenTitle.textContent =
+            "Checkers";
 
-  gameFrame.title = "Checkers game";
+        gameFrame.title =
+            "Checkers game";
 
-  gameFrame.src = "chess.html";
+        gameFrame.src =
+            "chess.html";
 
-  gameScreen.scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  });
 
-});
+        gameScreen.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+    }
+);
 
 
 /* ========================================
-OPEN TIC-TAC-TOE
+   OPEN TIC-TAC-TOE
 ======================================== */
 
-ticTacToeGameButton.addEventListener("click", () => {
+ticTacToeGameButton.addEventListener(
+    "click",
+    () => {
 
-  gameList.hidden = true;
+        gameList.hidden = true;
 
-  gameScreen.hidden = false;
+        gameScreen.hidden = false;
 
-  gameScreenTitle.textContent =
-    "Tic-Tac-Toe";
+        gameScreenTitle.textContent =
+            "Tic-Tac-Toe";
 
-  gameFrame.title =
-    "Tic-Tac-Toe game";
+        gameFrame.title =
+            "Tic-Tac-Toe game";
 
-  gameFrame.src =
-    "tictactoe.html";
+        gameFrame.src =
+            "tictactoe.html";
 
-  gameScreen.scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  });
 
-});
+        gameScreen.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+    }
+);
 
 
 /* ========================================
-BACK TO GAMES
+   BACK TO GAMES
 ======================================== */
 
-backToGames.addEventListener("click", () => {
+backToGames.addEventListener(
+    "click",
+    () => {
 
-  gameScreen.hidden = true;
+        gameScreen.hidden = true;
 
-  gameList.hidden = false;
+        gameList.hidden = false;
 
-  gameFrame.src = "";
+        gameFrame.src = "";
 
-  gameList.scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  });
 
-});
+        gameList.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+    }
+);
 
 
 /* ========================================
-LEADERBOARD ELEMENTS
+   LEADERBOARD ELEMENTS
 ======================================== */
 
 const leaderboardButton =
-  document.getElementById(
-    "leaderboardButton"
-  );
+    document.getElementById(
+        "leaderboardButton"
+    );
+
 
 const leaderboardPanel =
-  document.getElementById(
-    "leaderboardPanel"
-  );
+    document.getElementById(
+        "leaderboardPanel"
+    );
+
 
 const leaderboardOverlay =
-  document.getElementById(
-    "leaderboardOverlay"
-  );
+    document.getElementById(
+        "leaderboardOverlay"
+    );
+
 
 const closeLeaderboard =
-  document.getElementById(
-    "closeLeaderboard"
-  );
+    document.getElementById(
+        "closeLeaderboard"
+    );
+
 
 const leaderboardList =
-  document.getElementById(
-    "leaderboardList"
-  );
+    document.getElementById(
+        "leaderboardList"
+    );
 
 
 /* ========================================
-OPEN LEADERBOARD
+   OPEN LEADERBOARD
 ======================================== */
 
 async function openLeaderboard() {
 
-  leaderboardPanel.classList.add(
-    "is-open"
-  );
-
-  leaderboardOverlay.hidden = false;
-
-  leaderboardButton.setAttribute(
-    "aria-expanded",
-    "true"
-  );
-
-  leaderboardPanel.setAttribute(
-    "aria-hidden",
-    "false"
-  );
-
-  document.body.style.overflow =
-    "hidden";
+    leaderboardPanel.classList.add(
+        "is-open"
+    );
 
 
-  requestAnimationFrame(() => {
+    leaderboardOverlay.hidden =
+        false;
 
-    leaderboardOverlay.style.opacity =
-      "1";
 
-  });
+    leaderboardButton.setAttribute(
+        "aria-expanded",
+        "true"
+    );
 
-  await loadLeaderboard();
 
+    leaderboardPanel.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+
+    document.body.style.overflow =
+        "hidden";
+
+
+    requestAnimationFrame(() => {
+
+        leaderboardOverlay.style.opacity =
+            "1";
+
+    });
+
+
+    await loadLeaderboard();
 }
 
 
 /* ========================================
-CLOSE LEADERBOARD
+   CLOSE LEADERBOARD
 ======================================== */
 
 function closeLeaderboardPanel() {
 
-  leaderboardPanel.classList.remove(
-    "is-open"
-  );
-
-  leaderboardOverlay.style.opacity =
-    "0";
-
-  leaderboardButton.setAttribute(
-    "aria-expanded",
-    "false"
-  );
-
-  leaderboardPanel.setAttribute(
-    "aria-hidden",
-    "true"
-  );
-
-  document.body.style.overflow =
-    "";
-
-  setTimeout(() => {
-
-    if (
-      !leaderboardPanel.classList.contains(
+    leaderboardPanel.classList.remove(
         "is-open"
-      )
-    ) {
+    );
 
-      leaderboardOverlay.hidden =
-        true;
 
-    }
+    leaderboardOverlay.style.opacity =
+        "0";
 
-  }, 350);
 
+    leaderboardButton.setAttribute(
+        "aria-expanded",
+        "false"
+    );
+
+
+    leaderboardPanel.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    document.body.style.overflow =
+        "";
+
+
+    setTimeout(() => {
+
+        if (
+            !leaderboardPanel.classList.contains(
+                "is-open"
+            )
+        ) {
+
+            leaderboardOverlay.hidden =
+                true;
+
+        }
+
+    }, 350);
 }
 
 
 /* ========================================
-LEADERBOARD EVENTS
+   LEADERBOARD EVENTS
 ======================================== */
 
 leaderboardButton.addEventListener(
-  "click",
-  openLeaderboard
+    "click",
+    openLeaderboard
 );
+
 
 closeLeaderboard.addEventListener(
-  "click",
-  closeLeaderboardPanel
+    "click",
+    closeLeaderboardPanel
 );
 
+
 leaderboardOverlay.addEventListener(
-  "click",
-  closeLeaderboardPanel
+    "click",
+    closeLeaderboardPanel
 );
 
 
 /* ========================================
-ESC KEY
+   ESC KEY
 ======================================== */
 
 document.addEventListener(
-  "keydown",
-  (event) => {
+    "keydown",
+    (event) => {
 
-    if (
-      event.key === "Escape" &&
-      leaderboardPanel.classList.contains(
-        "is-open"
-      )
-    ) {
+        if (
+            event.key === "Escape" &&
+            leaderboardPanel.classList.contains(
+                "is-open"
+            )
+        ) {
 
-      closeLeaderboardPanel();
+            closeLeaderboardPanel();
+
+        }
 
     }
-
-  }
 );
 
 
 /* ========================================
-LOAD LEADERBOARD
+   LOAD LEADERBOARD
 ======================================== */
 
 async function loadLeaderboard() {
 
-  leaderboardList.innerHTML = `
-    <div class="leaderboard__loading">
-      Loading leaderboard...
-    </div>
-  `;
-
-  try {
-
-    const {
-      data,
-      error
-    } = await supabase
-
-      .from("player_stats")
-
-      .select(
-        "username, checkers_wins, tictactoe_wins, total_wins"
-      )
-
-      .order(
-        "total_wins",
-        {
-          ascending: false
-        }
-      )
-
-      .limit(10);
-
-
-    if (error) {
-
-      console.error(
-        "Leaderboard error:",
-        error
-      );
-
-      leaderboardList.innerHTML = `
-        <div class="leaderboard__error">
-          Could not load leaderboard.
-        </div>
-      `;
-
-      return;
-
-    }
-
-
-    if (!data || data.length === 0) {
-
-      leaderboardList.innerHTML = `
-        <div class="leaderboard__empty">
-          No players yet.
-        </div>
-      `;
-
-      return;
-
-    }
-
-
-    leaderboardList.innerHTML =
-      data
-        .map(
-          (player, index) => {
-
-            const rank =
-              index + 1;
-
-
-            return `
-              <div
-                class="leaderboard__player rank-${rank}"
-              >
-
-                <div
-                  class="leaderboard__rank"
-                >
-                  #${rank}
-                </div>
-
-
-                <div>
-
-                  <div
-                    class="leaderboard__player-name"
-                  >
-                    ${escapeHTML(
-                      player.username
-                    )}
-                  </div>
-
-
-                  <div
-                    class="leaderboard__games"
-                  >
-                    Checkers:
-                    ${player.checkers_wins}
-                    &nbsp;•&nbsp;
-                    Tic-Tac-Toe:
-                    ${player.tictactoe_wins}
-                  </div>
-
-                </div>
-
-
-                <div
-                  class="leaderboard__total"
-                >
-
-                  ${player.total_wins}
-
-                  <span
-                    class="leaderboard__total-label"
-                  >
-                    WINS
-                  </span>
-
-                </div>
-
-              </div>
-            `;
-
-          }
-        )
-        .join("");
-
-  } catch (error) {
-
-    console.error(
-      "Unexpected leaderboard error:",
-      error
-    );
-
-
     leaderboardList.innerHTML = `
-      <div class="leaderboard__error">
-        Could not load leaderboard.
-      </div>
+        <div class="leaderboard__loading">
+            Loading leaderboard...
+        </div>
     `;
 
-  }
 
+    try {
+
+        const {
+            data,
+            error
+        } = await supabase
+
+            .from("player_stats")
+
+            .select(
+                "username, checkers_wins, tictactoe_wins, total_wins"
+            )
+
+            .order(
+                "total_wins",
+                {
+                    ascending: false
+                }
+            )
+
+            .limit(10);
+
+
+        if (error) {
+
+            console.error(
+                "Leaderboard error:",
+                error
+            );
+
+
+            leaderboardList.innerHTML = `
+                <div class="leaderboard__error">
+                    Could not load leaderboard.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        if (
+            !data ||
+            data.length === 0
+        ) {
+
+            leaderboardList.innerHTML = `
+                <div class="leaderboard__empty">
+                    No players yet.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        leaderboardList.innerHTML =
+            data
+                .map(
+                    (player, index) => {
+
+                        const rank =
+                            index + 1;
+
+
+                        return `
+                            <div
+                                class="leaderboard__player rank-${rank}"
+                            >
+
+                                <div
+                                    class="leaderboard__rank"
+                                >
+                                    #${rank}
+                                </div>
+
+
+                                <div>
+
+                                    <div
+                                        class="leaderboard__player-name"
+                                    >
+                                        ${escapeHTML(
+                                            player.username
+                                        )}
+                                    </div>
+
+
+                                    <div
+                                        class="leaderboard__games"
+                                    >
+                                        Checkers:
+                                        ${Number(
+                                            player.checkers_wins || 0
+                                        )}
+
+                                        &nbsp;•&nbsp;
+
+                                        Tic-Tac-Toe:
+                                        ${Number(
+                                            player.tictactoe_wins || 0
+                                        )}
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="leaderboard__total"
+                                >
+
+                                    ${Number(
+                                        player.total_wins || 0
+                                    )}
+
+                                    <span
+                                        class="leaderboard__total-label"
+                                    >
+                                        WINS
+                                    </span>
+
+                                </div>
+
+                            </div>
+                        `;
+
+                    }
+                )
+                .join("");
+
+    } catch (error) {
+
+        console.error(
+            "Unexpected leaderboard error:",
+            error
+        );
+
+
+        leaderboardList.innerHTML = `
+            <div class="leaderboard__error">
+                Could not load leaderboard.
+            </div>
+        `;
+    }
 }
 
 
 /* ========================================
-HTML ESCAPE
+   HTML ESCAPE
 ======================================== */
 
 function escapeHTML(value) {
 
-  return String(value)
+    return String(value)
 
-    .replace(
-      /&/g,
-      "&amp;"
-    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
 
-    .replace(
-      /</g,
-      "&lt;"
-    )
+        .replace(
+            /</g,
+            "&lt;"
+        )
 
-    .replace(
-      />/g,
-      "&gt;"
-    )
+        .replace(
+            />/g,
+            "&gt;"
+        )
 
-    .replace(
-      /"/g,
-      "&quot;"
-    )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
 
-    .replace(
-      /'/g,
-      "&#039;"
-    );
-
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 }
 
 
 /* ========================================
-CURRENT YEAR
+   CURRENT YEAR
 ======================================== */
 
 const year =
-  document.getElementById("year");
+    document.getElementById(
+        "year"
+    );
+
 
 if (year) {
 
-  year.textContent =
-    new Date().getFullYear();
+    year.textContent =
+        new Date().getFullYear();
 
 }
-

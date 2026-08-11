@@ -1,103 +1,122 @@
 (function () {
     "use strict";
-  
+    
     // ============================================================
     // SUPABASE CHECKERS WIN TRACKING
     // ============================================================
-  
+    
     const supabaseClient = window.supabaseClient;
-  
+    
     let winRecorded = false;
-  
+    
     function getUsername() {
       let username = localStorage.getItem("chgames_username");
-  
+    
       if (!username) {
         username = prompt("Enter your CHgames username:");
-  
+    
         if (!username) {
           username = "Player";
         }
-  
+    
         username = username.trim().slice(0, 20);
-  
+    
         if (!username) {
           username = "Player";
         }
-  
+    
         localStorage.setItem(
           "chgames_username",
           username
         );
       }
-  
+    
       return username;
     }
-  
+    
     async function recordCheckersWin() {
       if (winRecorded) {
         return;
       }
-  
+    
       winRecorded = true;
-  
+    
       if (!supabaseClient) {
         console.error("Supabase client was not found.");
         winRecorded = false;
         return;
       }
-  
+    
       try {
         const username = getUsername();
-  
+    
         const {
           data: existingPlayer,
           error: selectError
         } = await supabaseClient
           .from("player_stats")
-          .select("id, username, checkers_wins, tictactoe_wins")
+          .select(
+            "id, username, checkers_wins, tictactoe_wins"
+          )
           .eq("username", username)
           .maybeSingle();
-  
+    
         if (selectError) {
           console.error(
             "Error finding player:",
             selectError
           );
-  
+    
           winRecorded = false;
           return;
         }
-  
-        // Player already exists
+    
+        // ========================================
+        // PLAYER ALREADY EXISTS
+        // ========================================
+    
         if (existingPlayer) {
+    
+          const checkersWins =
+            Number(existingPlayer.checkers_wins || 0) + 1;
+    
+          const ticTacToeWins =
+            Number(existingPlayer.tictactoe_wins || 0);
+    
+          const totalWins =
+            checkersWins + ticTacToeWins;
+    
           const {
             error: updateError
           } = await supabaseClient
             .from("player_stats")
             .update({
-              checkers_wins:
-                (existingPlayer.checkers_wins || 0) + 1
+              checkers_wins: checkersWins,
+              total_wins: totalWins
             })
             .eq("id", existingPlayer.id);
-  
+    
           if (updateError) {
             console.error(
               "Error updating Checkers wins:",
               updateError
             );
-  
+    
             winRecorded = false;
             return;
           }
-  
+    
           console.log(
             "Checkers win recorded!"
           );
         }
-  
-        // Player doesn't exist yet
+    
+        // ========================================
+        // PLAYER DOESN'T EXIST
+        // ========================================
+    
         else {
+    
           const {
             error: insertError
           } = await supabaseClient
@@ -105,30 +124,32 @@
             .insert({
               username: username,
               checkers_wins: 1,
-              tictactoe_wins: 0
+              tictactoe_wins: 0,
+              total_wins: 1
             });
-  
+    
           if (insertError) {
             console.error(
               "Error creating player:",
               insertError
             );
-  
+    
             winRecorded = false;
             return;
           }
-  
+    
           console.log(
             "Player created and Checkers win recorded!"
           );
         }
-  
+    
       } catch (error) {
+    
         console.error(
           "Supabase error:",
           error
         );
-  
+    
         winRecorded = false;
       }
     }
