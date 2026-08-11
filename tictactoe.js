@@ -727,4 +727,3 @@ function restartGame() {
 
 resetBoardState();
 
-x
