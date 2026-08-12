@@ -2389,10 +2389,8 @@
   }
   
   
-  function taphReact(
-    event
-  ) {
-  
+  function taphReact(event) {
+
     const reactions = {
   
       playerCapture: [
@@ -2437,7 +2435,7 @@
         "🤔",
         "..."
       ],
-
+  
       hesaidwhat: [
         "💀",
         "🥀",
@@ -2526,7 +2524,20 @@
           text.toLowerCase();
   
   
+        // LOL / BRUH
         if (
+          lower.includes("lol") ||
+          lower.includes("bruh") ||
+          lower.includes("bru")
+        ) {
+  
+          taphReact("hesaidwhat");
+  
+        }
+  
+  
+        // GREETINGS
+        else if (
           lower.includes("hi") ||
           lower.includes("hello") ||
           lower.includes("hey")
@@ -2534,36 +2545,41 @@
   
           taphReact("yourTurn");
   
-        } else if (
+        }
+  
+  
+        // HELP
+        else if (
           lower.includes("help")
         ) {
   
           taphReact("yourTurn");
   
-        } else if (
+        }
+  
+  
+        // GG
+        else if (
           lower.includes("gg") ||
           lower.includes("good game")
         ) {
   
           taphReact("win");
-        } else if (
-          lower.includes("nigga") ||
-          lower.includes("nigger") 
-         ) {
-          
-            taphReact("hesaidwhat");
-          
-         } else {
   
-          const random =
-            [
-              "👀",
-              "👍",
-              "🤨",
-              "😐",
-              "🎃",
-              "..."
-            ];
+        }
+  
+  
+        // OTHER MESSAGE
+        else {
+  
+          const random = [
+            "👀",
+            "👍",
+            "🤨",
+            "😐",
+            "🎃",
+            "..."
+          ];
   
   
           taphTyping(
@@ -2583,9 +2599,33 @@
       },
       300
     );
-  
   }
   
+  
+  // ============================================================
+  // CHAT EVENTS
+  // ============================================================
+  
+  chatSend.addEventListener(
+    "click",
+    sendChat
+  );
+  
+  
+  chatInput.addEventListener(
+    "keydown",
+    (event) => {
+  
+      if (
+        event.key === "Enter"
+      ) {
+  
+        sendChat();
+  
+      }
+  
+    }
+  );
   
   chatSend.addEventListener(
     "click",
