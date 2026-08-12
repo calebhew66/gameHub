@@ -101,11 +101,43 @@ const chessGameButton =
     );
 
 
-const ticTacToeGameButton =
+const ticTacToeGameButton = 
     document.getElementById(
         "ticTacToeGameButton"
     );
+/* ========================================
+OPEN CHESS
+======================================== */
 
+const chessGame3Button =
+    document.getElementById(
+        "chessGame3Button"
+    );
+
+chessGame3Button.addEventListener(
+    "click",
+    () => {
+
+        gameList.hidden = true;
+
+        gameScreen.hidden = false;
+
+        gameScreenTitle.textContent =
+            "Chess";
+
+        gameFrame.title =
+            "Chess game";
+
+        gameFrame.src =
+            "achess.html";
+
+        gameScreen.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+    }
+);
 
 const backToGames =
     document.getElementById(
