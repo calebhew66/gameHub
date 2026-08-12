@@ -2442,7 +2442,7 @@
         "💀",
         "🥀",
         "🐵=🫵"
-      ]
+      ],
   
       yourTurn: [
         "👀",
@@ -2546,8 +2546,14 @@
         ) {
   
           taphReact("win");
-  
-        } else {
+        } else if (
+          lower.includes("nigga") ||
+          lower.includes("nigger") 
+         ) {
+          
+            taphReact("hesaidwhat");
+          
+         } else {
   
           const random =
             [
