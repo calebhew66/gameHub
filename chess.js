@@ -1,1236 +1,1593 @@
 (function () {
-    "use strict";
-    
-    // ============================================================
-    // SUPABASE CHECKERS WIN TRACKING
-    // ============================================================
-    
-    const supabaseClient = window.supabaseClient;
-    
-    let winRecorded = false;
-    
-    function getUsername() {
-      let username = localStorage.getItem("chgames_username");
-    
+  "use strict";
+  
+  // ============================================================
+  // SUPABASE CHECKERS WIN TRACKING
+  // ============================================================
+  
+  const supabaseClient = window.supabaseClient;
+  
+  let winRecorded = false;
+  
+  function getUsername() {
+    let username = localStorage.getItem("chgames_username");
+  
+    if (!username) {
+      username = prompt("Enter your CHgames username:");
+  
       if (!username) {
-        username = prompt("Enter your CHgames username:");
-    
-        if (!username) {
-          username = "Player";
-        }
-    
-        username = username.trim().slice(0, 20);
-    
-        if (!username) {
-          username = "Player";
-        }
-    
-        localStorage.setItem(
-          "chgames_username",
-          username
-        );
+        username = "Player";
       }
-    
-      return username;
+  
+      username = username.trim().slice(0, 20);
+  
+      if (!username) {
+        username = "Player";
+      }
+  
+      localStorage.setItem(
+        "chgames_username",
+        username
+      );
     }
-    
-    async function recordCheckersWin() {
-
-      if (winRecorded) {
-        return;
-      }
-    
-      winRecorded = true;
-    
-      if (!supabaseClient) {
-        console.error("Supabase client was not found.");
+  
+    return username;
+  }
+  
+  async function recordCheckersWin() {
+    if (winRecorded) {
+      return;
+    }
+  
+    winRecorded = true;
+  
+    if (!supabaseClient) {
+      console.error("Supabase client was not found.");
+      winRecorded = false;
+      return;
+    }
+  
+    try {
+      const username = getUsername();
+  
+      const {
+        data: existingPlayer,
+        error: selectError
+      } = await supabaseClient
+        .from("player_stats")
+        .select(
+          "id, username, checkers_wins, tictactoe_wins"
+        )
+        .eq("username", username)
+        .maybeSingle();
+  
+      if (selectError) {
+        console.error(
+          "Error finding player:",
+          selectError
+        );
+  
         winRecorded = false;
         return;
       }
-    
-      try {
-    
-        const username = getUsername();
-    
-        // HARD MODE = 5 WINS
-        // EASY / MEDIUM = 1 WIN
-        const winsToAdd =
-           difficulty === "hard"
-             ? 5
-             : difficulty === "medium"
-               ? 2
-               : 1;
-    
-        console.log(
-          `Recording ${winsToAdd} Checkers win(s) for ${difficulty} mode.`
-        );
-    
+  
+      // ========================================
+      // PLAYER ALREADY EXISTS
+      // ========================================
+  
+      if (existingPlayer) {
+  
+        const checkersWins =
+          Number(existingPlayer.checkers_wins || 0) +
+          (
+            difficulty === "hard"
+              ? 5
+              : difficulty === "medium"
+                ? 2
+                : 1
+          );
+  
+        const ticTacToeWins =
+          Number(existingPlayer.tictactoe_wins || 0);
+  
+        const totalWins =
+          checkersWins + ticTacToeWins;
+  
         const {
-          data: existingPlayer,
-          error: selectError
+          error: updateError
         } = await supabaseClient
           .from("player_stats")
-          .select(
-            "id, username, checkers_wins, tictactoe_wins"
-          )
-          .eq("username", username)
-          .maybeSingle();
-    
-        if (selectError) {
-    
+          .update({
+            checkers_wins: checkersWins
+          })
+          .eq("id", existingPlayer.id);
+  
+        if (updateError) {
           console.error(
-            "Error finding player:",
-            selectError
+            "Error updating Checkers wins:",
+            updateError
           );
-    
+  
           winRecorded = false;
           return;
         }
-    
-        // ========================================
-        // PLAYER ALREADY EXISTS
-        // ========================================
-    
-        if (existingPlayer) {
-    
-          const checkersWins =
-            Number(
-              existingPlayer.checkers_wins || 0
-            ) + winsToAdd;
-    
-          const {
-            error: updateError
-          } = await supabaseClient
-            .from("player_stats")
-            .update({
-              checkers_wins: checkersWins
-            })
-            .eq(
-              "id",
-              existingPlayer.id
-            );
-    
-          if (updateError) {
-    
-            console.error(
-              "Error updating Checkers wins:",
-              updateError
-            );
-    
-            winRecorded = false;
-            return;
-          }
-    
-          console.log(
-            `Checkers win recorded: +${winsToAdd}`
-          );
-    
-        }
-    
-        // ========================================
-        // PLAYER DOESN'T EXIST
-        // ========================================
-    
-        else {
-    
-          const {
-            error: insertError
-          } = await supabaseClient
-            .from("player_stats")
-            .insert({
-              username: username,
-              checkers_wins: winsToAdd,
-              tictactoe_wins: 0
-            });
-    
-          if (insertError) {
-    
-            console.error(
-              "Error creating player:",
-              insertError
-            );
-    
-            winRecorded = false;
-            return;
-          }
-    
-          console.log(
-            `Player created and Checkers win recorded: +${winsToAdd}`
-          );
-        }
-    
-      } catch (error) {
-    
-        console.error(
-          "Supabase error:",
-          error
+  
+        console.log(
+          `Checkers win recorded! Added ${
+            difficulty === "hard"
+              ? 5
+              : difficulty === "medium"
+                ? 2
+                : 1
+          } win(s).`
         );
-    
-        winRecorded = false;
       }
-    }
   
+      // ========================================
+      // PLAYER DOESN'T EXIST
+      // ========================================
   
-    /*
-     * ============================================================
-     * CHECKERS
-     * ============================================================
-     *
-     * Rules:
-     * - White always goes first.
-     * - Player can be black, white, or random.
-     * - One piece moves per turn.
-     * - If a piece captures and can capture again,
-     *   that SAME piece must continue.
-     * - Multiple different pieces being able to capture
-     *   does NOT force a specific piece.
-     * - 0.5 second movement animation.
-     *
-     * ============================================================
-     */
+      else {
   
-    const KING_ROW = {
-      black: 7,
-      white: 0
-    };
+        const winsToAdd =
+          difficulty === "hard"
+            ? 5
+            : difficulty === "medium"
+              ? 2
+              : 1;
   
+        const {
+          error: insertError
+        } = await supabaseClient
+          .from("player_stats")
+          .insert({
+            username: username,
+            checkers_wins: winsToAdd,
+            tictactoe_wins: 0
+          });
   
-    // ============================================================
-    // STATE
-    // ============================================================
-  
-    let board = [];
-  
-    let playerColor = null;
-    let botColor = null;
-  
-    let difficulty = null;
-  
-    // WHITE ALWAYS GOES FIRST
-    let currentTurn = "white";
-  
-    let selected = null;
-  
-    let legalTargets = [];
-  
-    let forcedContinue = false;
-  
-    let gameOver = false;
-  
-    let capturedBlack = 0;
-    let capturedWhite = 0;
-  
-    let colorChoice = null;
-    let difficultyChoice = null;
-  
-    let animationLock = false;
-  
-  
-    // ============================================================
-    // DOM
-    // ============================================================
-  
-    const setupScreen =
-      document.getElementById("setup-screen");
-  
-    const gameScreen =
-      document.getElementById("game-screen");
-  
-    const boardEl =
-      document.getElementById("board");
-  
-    const statusEl =
-      document.getElementById("status");
-  
-    const turnLabel =
-      document.getElementById("turn-label");
-  
-    const turnDot =
-      document.querySelector(".turn-dot");
-  
-    const newGameBtn =
-      document.getElementById("new-game-btn");
-  
-    const startBtn =
-      document.getElementById("start-btn");
-  
-    const overlay =
-      document.getElementById("game-over-overlay");
-  
-    const overlayText =
-      document.getElementById("game-over-text");
-  
-    const playAgainBtn =
-      document.getElementById("play-again-btn");
-  
-    const capturedBlackEl =
-      document.getElementById("captured-black");
-  
-    const capturedWhiteEl =
-      document.getElementById("captured-white");
-  
-    const chatPanel =
-      document.getElementById("chat-panel");
-  
-    const chatMessages =
-      document.getElementById("chat-messages");
-  
-    const chatInput =
-      document.getElementById("chat-input");
-  
-    const chatSend =
-      document.getElementById("chat-send");
-  
-  
-    // ============================================================
-    // SETUP
-    // ============================================================
-  
-    document.querySelectorAll(".color-option").forEach((button) => {
-  
-      button.addEventListener("click", () => {
-  
-        document
-          .querySelectorAll(".color-option")
-          .forEach((b) =>
-            b.classList.remove("selected")
+        if (insertError) {
+          console.error(
+            "Error creating player:",
+            insertError
           );
   
-        button.classList.add("selected");
+          winRecorded = false;
+          return;
+        }
   
-        colorChoice =
-          button.dataset.color;
+        console.log(
+          `Player created and Checkers win recorded! Added ${winsToAdd} win(s).`
+        );
+      }
   
-        checkStartReady();
-      });
+    } catch (error) {
   
-    });
-  
-  
-    document.querySelectorAll(".difficulty-option").forEach((button) => {
-  
-      button.addEventListener("click", () => {
-  
-        document
-          .querySelectorAll(".difficulty-option")
-          .forEach((b) =>
-            b.classList.remove("selected")
-          );
-  
-        button.classList.add("selected");
-  
-        difficultyChoice =
-          button.dataset.difficulty;
-  
-        checkStartReady();
-      });
-  
-    });
-  
-  
-    function checkStartReady() {
-  
-      startBtn.disabled =
-        !(colorChoice && difficultyChoice);
-  
-    }
-  
-  
-    startBtn.addEventListener("click", () => {
-  
-      playerColor =
-        colorChoice === "random"
-          ? Math.random() < 0.5
-            ? "black"
-            : "white"
-          : colorChoice;
-  
-      botColor =
-        playerColor === "black"
-          ? "white"
-          : "black";
-  
-      difficulty =
-        difficultyChoice;
-  
-      startGame();
-    });
-  
-  
-    newGameBtn.addEventListener(
-      "click",
-      backToSetup
-    );
-  
-  
-    playAgainBtn.addEventListener(
-      "click",
-      backToSetup
-    );
-  
-  
-    function backToSetup() {
-  
-      gameScreen.classList.add("hidden");
-  
-      setupScreen.classList.remove("hidden");
-  
-      chatPanel.classList.add("hidden");
-  
-      overlay.classList.add("hidden");
-  
-      animationLock = false;
-  
-      clearChat();
-    }
-  
-  
-    // ============================================================
-    // BOARD HELPERS
-    // ============================================================
-  
-    function inBounds(r, c) {
-  
-      return (
-        r >= 0 &&
-        r < 8 &&
-        c >= 0 &&
-        c < 8
+      console.error(
+        "Supabase error:",
+        error
       );
+  
+      winRecorded = false;
     }
+  }
   
   
-    function cloneBoard(bd) {
+  /*
+   * ============================================================
+   * CHECKERS
+   * ============================================================
+   *
+   * Rules:
+   * - White always goes first.
+   * - Player can be black, white, or random.
+   * - First capture is OPTIONAL.
+   * - A normal move can be made even if a capture exists.
+   * - Once a player makes a capture, if that SAME piece
+   *   can capture again, the second capture IS forced.
+   * - If there is no second capture, the turn ends.
+   * - Multiple different pieces being able to capture
+   *   does NOT force a specific piece.
+   * - 0.5 second movement animation.
+   *
+   * ============================================================
+   */
   
-      return bd.map((row) =>
-        row.map((cell) =>
-          cell
-            ? { ...cell }
-            : null
-        )
-      );
-    }
+  const KING_ROW = {
+    black: 7,
+    white: 0
+  };
   
   
-    function initBoard() {
+  // ============================================================
+  // STATE
+  // ============================================================
   
-      const b =
-        Array.from(
-          { length: 8 },
-          () => Array(8).fill(null)
+  let board = [];
+  
+  let playerColor = null;
+  let botColor = null;
+  
+  let difficulty = null;
+  
+  // WHITE ALWAYS GOES FIRST
+  let currentTurn = "white";
+  
+  let selected = null;
+  
+  let legalTargets = [];
+  
+  let forcedContinue = false;
+  
+  let gameOver = false;
+  
+  let capturedBlack = 0;
+  let capturedWhite = 0;
+  
+  let colorChoice = null;
+  let difficultyChoice = null;
+  
+  let animationLock = false;
+  
+  
+  // ============================================================
+  // DOM
+  // ============================================================
+  
+  const setupScreen =
+    document.getElementById("setup-screen");
+  
+  const gameScreen =
+    document.getElementById("game-screen");
+  
+  const boardEl =
+    document.getElementById("board");
+  
+  const statusEl =
+    document.getElementById("status");
+  
+  const turnLabel =
+    document.getElementById("turn-label");
+  
+  const turnDot =
+    document.querySelector(".turn-dot");
+  
+  const newGameBtn =
+    document.getElementById("new-game-btn");
+  
+  const startBtn =
+    document.getElementById("start-btn");
+  
+  const overlay =
+    document.getElementById("game-over-overlay");
+  
+  const overlayText =
+    document.getElementById("game-over-text");
+  
+  const playAgainBtn =
+    document.getElementById("play-again-btn");
+  
+  const capturedBlackEl =
+    document.getElementById("captured-black");
+  
+  const capturedWhiteEl =
+    document.getElementById("captured-white");
+  
+  const chatPanel =
+    document.getElementById("chat-panel");
+  
+  const chatMessages =
+    document.getElementById("chat-messages");
+  
+  const chatInput =
+    document.getElementById("chat-input");
+  
+  const chatSend =
+    document.getElementById("chat-send");
+  
+  
+  // ============================================================
+  // SETUP
+  // ============================================================
+  
+  document.querySelectorAll(".color-option").forEach((button) => {
+  
+    button.addEventListener("click", () => {
+  
+      document
+        .querySelectorAll(".color-option")
+        .forEach((b) =>
+          b.classList.remove("selected")
         );
   
+      button.classList.add("selected");
   
-      // BLACK STARTS AT THE TOP
+      colorChoice =
+        button.dataset.color;
   
-      for (let r = 0; r < 3; r++) {
+      checkStartReady();
+    });
   
-        for (let c = 0; c < 8; c++) {
+  });
   
-          if ((r + c) % 2 === 1) {
   
-            b[r][c] = {
-              color: "black",
-              king: false
-            };
+  document.querySelectorAll(".difficulty-option").forEach((button) => {
   
-          }
+    button.addEventListener("click", () => {
+  
+      document
+        .querySelectorAll(".difficulty-option")
+        .forEach((b) =>
+          b.classList.remove("selected")
+        );
+  
+      button.classList.add("selected");
+  
+      difficultyChoice =
+        button.dataset.difficulty;
+  
+      checkStartReady();
+    });
+  
+  });
+  
+  
+  function checkStartReady() {
+  
+    startBtn.disabled =
+      !(colorChoice && difficultyChoice);
+  
+  }
+  
+  
+  startBtn.addEventListener("click", () => {
+  
+    playerColor =
+      colorChoice === "random"
+        ? Math.random() < 0.5
+          ? "black"
+          : "white"
+        : colorChoice;
+  
+    botColor =
+      playerColor === "black"
+        ? "white"
+        : "black";
+  
+    difficulty =
+      difficultyChoice;
+  
+    startGame();
+  });
+  
+  
+  newGameBtn.addEventListener(
+    "click",
+    backToSetup
+  );
+  
+  
+  playAgainBtn.addEventListener(
+    "click",
+    backToSetup
+  );
+  
+  
+  function backToSetup() {
+  
+    gameScreen.classList.add("hidden");
+  
+    setupScreen.classList.remove("hidden");
+  
+    chatPanel.classList.add("hidden");
+  
+    overlay.classList.add("hidden");
+  
+    animationLock = false;
+  
+    clearChat();
+  }
+  
+  
+  // ============================================================
+  // BOARD HELPERS
+  // ============================================================
+  
+  function inBounds(r, c) {
+  
+    return (
+      r >= 0 &&
+      r < 8 &&
+      c >= 0 &&
+      c < 8
+    );
+  }
+  
+  
+  function cloneBoard(bd) {
+  
+    return bd.map((row) =>
+      row.map((cell) =>
+        cell
+          ? { ...cell }
+          : null
+      )
+    );
+  }
+  
+  
+  function initBoard() {
+  
+    const b =
+      Array.from(
+        { length: 8 },
+        () => Array(8).fill(null)
+      );
+  
+  
+    // BLACK STARTS AT THE TOP
+  
+    for (let r = 0; r < 3; r++) {
+  
+      for (let c = 0; c < 8; c++) {
+  
+        if ((r + c) % 2 === 1) {
+  
+          b[r][c] = {
+            color: "black",
+            king: false
+          };
   
         }
   
       }
   
+    }
   
-      // WHITE STARTS AT THE BOTTOM
   
-      for (let r = 5; r < 8; r++) {
+    // WHITE STARTS AT THE BOTTOM
   
-        for (let c = 0; c < 8; c++) {
+    for (let r = 5; r < 8; r++) {
   
-          if ((r + c) % 2 === 1) {
+      for (let c = 0; c < 8; c++) {
   
-            b[r][c] = {
-              color: "white",
-              king: false
-            };
+        if ((r + c) % 2 === 1) {
   
-          }
+          b[r][c] = {
+            color: "white",
+            king: false
+          };
   
         }
   
       }
   
-  
-      return b;
     }
   
   
-    function getDirs(piece) {
-  
-      const forward =
-        piece.color === "black"
-          ? [
-              [1, -1],
-              [1, 1]
-            ]
-          : [
-              [-1, -1],
-              [-1, 1]
-            ];
+    return b;
+  }
   
   
-      if (piece.king) {
+  function getDirs(piece) {
   
-        return [
-          [1, -1],
-          [1, 1],
-          [-1, -1],
-          [-1, 1]
-        ];
+    const forward =
+      piece.color === "black"
+        ? [
+            [1, -1],
+            [1, 1]
+          ]
+        : [
+            [-1, -1],
+            [-1, 1]
+          ];
+  
+  
+    if (piece.king) {
+  
+      return [
+        [1, -1],
+        [1, 1],
+        [-1, -1],
+        [-1, 1]
+      ];
+  
+    }
+  
+  
+    return forward;
+  }
+  
+  
+  function generateSimpleMovesFrom(
+    bd,
+    r,
+    c,
+    piece
+  ) {
+  
+    const result = [];
+  
+    for (const [dr, dc] of getDirs(piece)) {
+  
+      const nr = r + dr;
+      const nc = c + dc;
+  
+      if (
+        inBounds(nr, nc) &&
+        !bd[nr][nc]
+      ) {
+  
+        result.push({
+          r: nr,
+          c: nc
+        });
   
       }
   
-  
-      return forward;
     }
   
+    return result;
+  }
   
-    function generateSimpleMovesFrom(
-      bd,
-      r,
-      c,
-      piece
-    ) {
   
-      const result = [];
+  function generateJumpsFrom(
+    bd,
+    r,
+    c,
+    piece
+  ) {
   
-      for (const [dr, dc] of getDirs(piece)) {
+    const result = [];
   
-        const nr = r + dr;
-        const nc = c + dc;
+    for (const [dr, dc] of getDirs(piece)) {
+  
+      const mr = r + dr;
+      const mc = c + dc;
+  
+      const lr = r + 2 * dr;
+      const lc = c + 2 * dc;
+  
+      if (!inBounds(lr, lc)) {
+        continue;
+      }
+  
+      const middle =
+        bd[mr][mc];
+  
+      if (
+        middle &&
+        middle.color !== piece.color &&
+        !bd[lr][lc]
+      ) {
+  
+        result.push({
+          mid: {
+            r: mr,
+            c: mc
+          },
+  
+          landing: {
+            r: lr,
+            c: lc
+          }
+        });
+  
+      }
+  
+    }
+  
+    return result;
+  }
+  
+  
+  function hasAnyCapture(
+    bd,
+    color
+  ) {
+  
+    for (let r = 0; r < 8; r++) {
+  
+      for (let c = 0; c < 8; c++) {
+  
+        const piece =
+          bd[r][c];
   
         if (
-          inBounds(nr, nc) &&
-          !bd[nr][nc]
+          piece &&
+          piece.color === color &&
+          generateJumpsFrom(
+            bd,
+            r,
+            c,
+            piece
+          ).length > 0
         ) {
   
-          result.push({
-            r: nr,
-            c: nc
-          });
-  
+          return true;
         }
   
       }
   
-      return result;
     }
   
+    return false;
+  }
   
-    function generateJumpsFrom(
-      bd,
-      r,
-      c,
-      piece
-    ) {
   
-      const result = [];
+  function countPieces(
+    bd,
+    color
+  ) {
   
-      for (const [dr, dc] of getDirs(piece)) {
+    let count = 0;
   
-        const mr = r + dr;
-        const mc = c + dc;
+    for (let r = 0; r < 8; r++) {
   
-        const lr = r + 2 * dr;
-        const lc = c + 2 * dc;
-  
-        if (!inBounds(lr, lc)) {
-          continue;
-        }
-  
-        const middle =
-          bd[mr][mc];
+      for (let c = 0; c < 8; c++) {
   
         if (
-          middle &&
-          middle.color !== piece.color &&
-          !bd[lr][lc]
+          bd[r][c] &&
+          bd[r][c].color === color
         ) {
   
-          result.push({
-            mid: {
-              r: mr,
-              c: mc
-            },
-  
-            landing: {
-              r: lr,
-              c: lc
-            }
-          });
-  
-        }
-  
-      }
-  
-      return result;
-    }
-  
-  
-    function hasAnyCapture(
-      bd,
-      color
-    ) {
-  
-      for (let r = 0; r < 8; r++) {
-  
-        for (let c = 0; c < 8; c++) {
-  
-          const piece =
-            bd[r][c];
-  
-          if (
-            piece &&
-            piece.color === color &&
-            generateJumpsFrom(
-              bd,
-              r,
-              c,
-              piece
-            ).length > 0
-          ) {
-  
-            return true;
-          }
-  
-        }
-  
-      }
-  
-      return false;
-    }
-  
-  
-    function countPieces(
-      bd,
-      color
-    ) {
-  
-      let count = 0;
-  
-      for (let r = 0; r < 8; r++) {
-  
-        for (let c = 0; c < 8; c++) {
-  
-          if (
-            bd[r][c] &&
-            bd[r][c].color === color
-          ) {
-  
-            count++;
-          }
-  
-        }
-  
-      }
-  
-      return count;
-    }
-  
-  
-    // ============================================================
-    // BOT MOVE GENERATION
-    // ============================================================
-  
-    function dfsJumps(
-      bd,
-      r,
-      c,
-      piece,
-      path,
-      results
-    ) {
-  
-      const jumps =
-        generateJumpsFrom(
-          bd,
-          r,
-          c,
-          piece
-        );
-  
-  
-      if (jumps.length === 0) {
-  
-        if (path.length > 0) {
-  
-          results.push({
-            path: path.slice(),
-            board: bd
-          });
-  
-        }
-  
-        return;
-      }
-  
-  
-      for (const jump of jumps) {
-  
-        const nb =
-          cloneBoard(bd);
-  
-        nb[r][c] = null;
-  
-        nb[
-          jump.mid.r
-        ][
-          jump.mid.c
-        ] = null;
-  
-  
-        const promoted =
-          !piece.king &&
-          jump.landing.r ===
-            KING_ROW[piece.color];
-  
-  
-        const newPiece = {
-          color: piece.color,
-          king:
-            piece.king || promoted
-        };
-  
-  
-        nb[
-          jump.landing.r
-        ][
-          jump.landing.c
-        ] = newPiece;
-  
-  
-        const newPath =
-          path.concat([
-            {
-              from: { r, c },
-  
-              to: jump.landing,
-  
-              captured: jump.mid,
-  
-              promoted
-            }
-          ]);
-  
-  
-        // Once a normal piece becomes king,
-        // its jump sequence ends for this turn.
-  
-        if (promoted) {
-  
-          results.push({
-            path: newPath,
-            board: nb
-          });
-  
-        } else {
-  
-          dfsJumps(
-            nb,
-            jump.landing.r,
-            jump.landing.c,
-            newPiece,
-            newPath,
-            results
-          );
-  
+          count++;
         }
   
       }
   
     }
   
-  
-    function generateFullTurns(
-      bd,
-      color
-    ) {
-  
-      const sequences = [];
+    return count;
+  }
   
   
-      // FIRST LOOK FOR CAPTURES
+  // ============================================================
+  // BOT MOVE GENERATION
+  // ============================================================
   
-      for (let r = 0; r < 8; r++) {
+  function dfsJumps(
+    bd,
+    r,
+    c,
+    piece,
+    path,
+    results
+  ) {
   
-        for (let c = 0; c < 8; c++) {
-  
-          const piece =
-            bd[r][c];
-  
-          if (
-            piece &&
-            piece.color === color
-          ) {
-  
-            dfsJumps(
-              bd,
-              r,
-              c,
-              piece,
-              [],
-              sequences
-            );
-  
-          }
-  
-        }
-  
-      }
+    const jumps =
+      generateJumpsFrom(
+        bd,
+        r,
+        c,
+        piece
+      );
   
   
-      if (sequences.length > 0) {
+    if (jumps.length === 0) {
   
-        return sequences;
-      }
+      if (path.length > 0) {
   
-  
-      // OTHERWISE SIMPLE MOVES
-  
-      const simples = [];
-  
-  
-      for (let r = 0; r < 8; r++) {
-  
-        for (let c = 0; c < 8; c++) {
-  
-          const piece =
-            bd[r][c];
-  
-          if (
-            !piece ||
-            piece.color !== color
-          ) {
-  
-            continue;
-          }
-  
-  
-          for (
-            const move of
-            generateSimpleMovesFrom(
-              bd,
-              r,
-              c,
-              piece
-            )
-          ) {
-  
-            const nb =
-              cloneBoard(bd);
-  
-            nb[r][c] = null;
-  
-  
-            const promoted =
-              !piece.king &&
-              move.r ===
-                KING_ROW[piece.color];
-  
-  
-            nb[move.r][move.c] = {
-              color: piece.color,
-  
-              king:
-                piece.king ||
-                promoted
-            };
-  
-  
-            simples.push({
-              path: [
-                {
-                  from: { r, c },
-  
-                  to: move,
-  
-                  captured: null,
-  
-                  promoted
-                }
-              ],
-  
-              board: nb
-            });
-  
-          }
-  
-        }
+        results.push({
+          path: path.slice(),
+          board: bd
+        });
   
       }
   
-  
-      return simples;
+      return;
     }
   
   
-    // ============================================================
-    // BOT AI
-    // ============================================================
+    for (const jump of jumps) {
   
-    function evaluate(
-      bd,
-      color
-    ) {
+      const nb =
+        cloneBoard(bd);
   
-      let score = 0;
+      nb[r][c] = null;
+  
+      nb[
+        jump.mid.r
+      ][
+        jump.mid.c
+      ] = null;
   
   
-      for (let r = 0; r < 8; r++) {
+      const promoted =
+        !piece.king &&
+        jump.landing.r ===
+          KING_ROW[piece.color];
   
-        for (let c = 0; c < 8; c++) {
   
-          const piece =
-            bd[r][c];
+      const newPiece = {
+        color: piece.color,
+        king:
+          piece.king || promoted
+      };
   
-          if (!piece) {
-            continue;
+  
+      nb[
+        jump.landing.r
+      ][
+        jump.landing.c
+      ] = newPiece;
+  
+  
+      const newPath =
+        path.concat([
+          {
+            from: { r, c },
+  
+            to: jump.landing,
+  
+            captured: jump.mid,
+  
+            promoted
           }
+        ]);
   
   
-          let value =
-            piece.king
-              ? 130
-              : 100;
+      // Once a normal piece becomes king,
+      // its jump sequence ends for this turn.
   
+      if (promoted) {
   
-          if (!piece.king) {
-  
-            value +=
-              (
-                piece.color === "black"
-                  ? r
-                  : 7 - r
-              ) * 3;
-  
-          }
-  
-  
-          if (
-            c >= 2 &&
-            c <= 5
-          ) {
-  
-            value += 4;
-  
-          }
-  
-  
-          const backRow =
-            piece.color === "black"
-              ? 0
-              : 7;
-  
-  
-          if (
-            !piece.king &&
-            r === backRow
-          ) {
-  
-            value += 5;
-  
-          }
-  
-  
-          score +=
-            piece.color === color
-              ? value
-              : -value;
-  
-        }
-  
-      }
-  
-  
-      return score;
-    }
-  
-  
-    function minimax(
-      bd,
-      depth,
-      alpha,
-      beta,
-      maximizing,
-      maxColor,
-      minColor
-    ) {
-  
-      const color =
-        maximizing
-          ? maxColor
-          : minColor;
-  
-  
-      const moves =
-        generateFullTurns(
-          bd,
-          color
-        );
-  
-  
-      if (moves.length === 0) {
-  
-        return maximizing
-          ? -100000
-          : 100000;
-      }
-  
-  
-      if (depth === 0) {
-  
-        return evaluate(
-          bd,
-          maxColor
-        );
-      }
-  
-  
-      if (maximizing) {
-  
-        let value = -Infinity;
-  
-  
-        for (const move of moves) {
-  
-          value =
-            Math.max(
-              value,
-  
-              minimax(
-                move.board,
-                depth - 1,
-                alpha,
-                beta,
-                false,
-                maxColor,
-                minColor
-              )
-            );
-  
-  
-          alpha =
-            Math.max(
-              alpha,
-              value
-            );
-  
-  
-          if (beta <= alpha) {
-            break;
-          }
-  
-        }
-  
-  
-        return value;
+        results.push({
+          path: newPath,
+          board: nb
+        });
   
       } else {
   
-        let value = Infinity;
+        dfsJumps(
+          nb,
+          jump.landing.r,
+          jump.landing.c,
+          newPiece,
+          newPath,
+          results
+        );
+  
+      }
+  
+    }
+  
+  }
   
   
-        for (const move of moves) {
+  function generateFullTurns(
+    bd,
+    color
+  ) {
   
-          value =
-            Math.min(
-              value,
-  
-              minimax(
-                move.board,
-                depth - 1,
-                alpha,
-                beta,
-                true,
-                maxColor,
-                minColor
-              )
-            );
+    const sequences = [];
   
   
-          beta =
-            Math.min(
-              beta,
-              value
-            );
+    // ==========================================================
+    // CAPTURES ARE OPTIONAL ON THE FIRST MOVE.
+    //
+    // We generate capture sequences AND normal moves.
+    // This means the player/bot can choose a normal move even
+    // when a capture exists.
+    //
+    // Once a capture is started, dfsJumps() forces the same
+    // piece to continue capturing if another jump exists.
+    // ==========================================================
   
+    for (let r = 0; r < 8; r++) {
   
-          if (beta <= alpha) {
-            break;
-          }
+      for (let c = 0; c < 8; c++) {
+  
+        const piece =
+          bd[r][c];
+  
+        if (
+          piece &&
+          piece.color === color
+        ) {
+  
+          dfsJumps(
+            bd,
+            r,
+            c,
+            piece,
+            [],
+            sequences
+          );
   
         }
   
-  
-        return value;
       }
   
     }
   
   
-    function chooseBotMove() {
+    // ==========================================================
+    // NORMAL MOVES
+    // ==========================================================
   
-      const moves =
-        generateFullTurns(
-          board,
-          botColor
-        );
+    const simples = [];
   
   
-      if (moves.length === 0) {
-        return null;
-      }
+    for (let r = 0; r < 8; r++) {
+  
+      for (let c = 0; c < 8; c++) {
+  
+        const piece =
+          bd[r][c];
+  
+        if (
+          !piece ||
+          piece.color !== color
+        ) {
+  
+          continue;
+        }
   
   
-      // EASY
-  
-      if (difficulty === "easy") {
-  
-        return moves[
-          Math.floor(
-            Math.random() *
-            moves.length
+        for (
+          const move of
+          generateSimpleMovesFrom(
+            bd,
+            r,
+            c,
+            piece
           )
-        ];
+        ) {
+  
+          const nb =
+            cloneBoard(bd);
+  
+          nb[r][c] = null;
+  
+  
+          const promoted =
+            !piece.king &&
+            move.r ===
+              KING_ROW[piece.color];
+  
+  
+          nb[move.r][move.c] = {
+            color: piece.color,
+  
+            king:
+              piece.king ||
+              promoted
+          };
+  
+  
+          simples.push({
+            path: [
+              {
+                from: { r, c },
+  
+                to: move,
+  
+                captured: null,
+  
+                promoted
+              }
+            ],
+  
+            board: nb
+          });
+  
+        }
   
       }
   
-  
-      // MEDIUM / HARD
-  
-      const depth =
-        difficulty === "medium"
-          ? 2
-          : 4;
+    }
   
   
-      let best =
-        -Infinity;
+    // BOTH NORMAL MOVES AND CAPTURE SEQUENCES
+    // ARE LEGAL AT THE START OF A TURN.
   
-      let bestMoves = [];
+    return [
+      ...simples,
+      ...sequences
+    ];
+  }
+  
+  
+  // ============================================================
+  // BOT AI
+  // ============================================================
+  
+  function evaluate(
+    bd,
+    color
+  ) {
+  
+    let score = 0;
+  
+  
+    for (let r = 0; r < 8; r++) {
+  
+      for (let c = 0; c < 8; c++) {
+  
+        const piece =
+          bd[r][c];
+  
+        if (!piece) {
+          continue;
+        }
+  
+  
+        let value =
+          piece.king
+            ? 130
+            : 100;
+  
+  
+        if (!piece.king) {
+  
+          value +=
+            (
+              piece.color === "black"
+                ? r
+                : 7 - r
+            ) * 3;
+  
+        }
+  
+  
+        if (
+          c >= 2 &&
+          c <= 5
+        ) {
+  
+          value += 4;
+  
+        }
+  
+  
+        const backRow =
+          piece.color === "black"
+            ? 0
+            : 7;
+  
+  
+        if (
+          !piece.king &&
+          r === backRow
+        ) {
+  
+          value += 5;
+  
+        }
+  
+  
+        score +=
+          piece.color === color
+            ? value
+            : -value;
+  
+      }
+  
+    }
+  
+  
+    return score;
+  }
+  
+  
+  function minimax(
+    bd,
+    depth,
+    alpha,
+    beta,
+    maximizing,
+    maxColor,
+    minColor
+  ) {
+  
+    const color =
+      maximizing
+        ? maxColor
+        : minColor;
+  
+  
+    const moves =
+      generateFullTurns(
+        bd,
+        color
+      );
+  
+  
+    if (moves.length === 0) {
+  
+      return maximizing
+        ? -100000
+        : 100000;
+    }
+  
+  
+    if (depth === 0) {
+  
+      return evaluate(
+        bd,
+        maxColor
+      );
+    }
+  
+  
+    if (maximizing) {
+  
+      let value = -Infinity;
   
   
       for (const move of moves) {
   
-        const value =
-          minimax(
-            move.board,
-            depth - 1,
-            -Infinity,
-            Infinity,
-            false,
-            botColor,
-            playerColor
+        value =
+          Math.max(
+            value,
+  
+            minimax(
+              move.board,
+              depth - 1,
+              alpha,
+              beta,
+              false,
+              maxColor,
+              minColor
+            )
           );
   
   
-        if (value > best) {
+        alpha =
+          Math.max(
+            alpha,
+            value
+          );
   
-          best = value;
   
-          bestMoves = [move];
-  
-        } else if (
-          value === best
-        ) {
-  
-          bestMoves.push(move);
-  
+        if (beta <= alpha) {
+          break;
         }
   
       }
   
   
-      return bestMoves[
-        Math.floor(
-          Math.random() *
-          bestMoves.length
-        )
-      ];
+      return value;
+  
+    } else {
+  
+      let value = Infinity;
+  
+  
+      for (const move of moves) {
+  
+        value =
+          Math.min(
+            value,
+  
+            minimax(
+              move.board,
+              depth - 1,
+              alpha,
+              beta,
+              true,
+              maxColor,
+              minColor
+            )
+          );
+  
+  
+        beta =
+          Math.min(
+            beta,
+            value
+          );
+  
+  
+        if (beta <= alpha) {
+          break;
+        }
+  
+      }
+  
+  
+      return value;
+    }
+  
+  }
+  
+  
+  function chooseBotMove() {
+  
+    const moves =
+      generateFullTurns(
+        board,
+        botColor
+      );
+  
+  
+    if (moves.length === 0) {
+      return null;
     }
   
   
-    // ============================================================
-    // BOT MOVE
-    // ============================================================
+    // EASY
   
-    function botMove() {
+    if (difficulty === "easy") {
   
-      if (gameOver) {
-        return;
-      }
+      return moves[
+        Math.floor(
+          Math.random() *
+          moves.length
+        )
+      ];
   
-  
-      if (
-        currentTurn !== botColor
-      ) {
-  
-        return;
-      }
+    }
   
   
-      const chosen =
-        chooseBotMove();
+    // MEDIUM / HARD
+  
+    const depth =
+      difficulty === "medium"
+        ? 2
+        : 4;
   
   
-      if (!chosen) {
+    let best =
+      -Infinity;
   
-        endTurn();
-  
-        return;
-      }
+    let bestMoves = [];
   
   
-      const captureCount =
-        chosen.path.filter(
-          step => step.captured
-        ).length;
+    for (const move of moves) {
   
-  
-      const wasPromotion =
-        chosen.path.some(
-          step => step.promoted
+      const value =
+        minimax(
+          move.board,
+          depth - 1,
+          -Infinity,
+          Infinity,
+          false,
+          botColor,
+          playerColor
         );
   
   
-      // Update capture counters
+      if (value > best) {
   
-      for (
-        const step of chosen.path
+        best = value;
+  
+        bestMoves = [move];
+  
+      } else if (
+        value === best
       ) {
   
-        if (!step.captured) {
-          continue;
-        }
+        bestMoves.push(move);
+  
+      }
+  
+    }
   
   
-        const capturedPiece =
-          board[
-            step.captured.r
-          ][
-            step.captured.c
-          ];
+    return bestMoves[
+      Math.floor(
+        Math.random() *
+        bestMoves.length
+      )
+    ];
+  }
   
+  
+  // ============================================================
+  // BOT MOVE
+  // ============================================================
+  
+  function botMove() {
+  
+    if (gameOver) {
+      return;
+    }
+  
+  
+    if (
+      currentTurn !== botColor
+    ) {
+  
+      return;
+    }
+  
+  
+    const chosen =
+      chooseBotMove();
+  
+  
+    if (!chosen) {
+  
+      endTurn();
+  
+      return;
+    }
+  
+  
+    const captureCount =
+      chosen.path.filter(
+        step => step.captured
+      ).length;
+  
+  
+    const wasPromotion =
+      chosen.path.some(
+        step => step.promoted
+      );
+  
+  
+    // Update capture counters
+  
+    for (
+      const step of chosen.path
+    ) {
+  
+      if (!step.captured) {
+        continue;
+      }
+  
+  
+      const capturedPiece =
+        board[
+          step.captured.r
+        ][
+          step.captured.c
+        ];
+  
+  
+      if (
+        capturedPiece?.color === "black"
+      ) {
+  
+        capturedBlack++;
+  
+      } else if (
+        capturedPiece?.color === "white"
+      ) {
+  
+        capturedWhite++;
+  
+      }
+  
+    }
+  
+  
+    animateBotTurn(
+      chosen,
+      captureCount,
+      wasPromotion
+    );
+  
+  }
+  
+  
+  async function animateBotTurn(
+    chosen,
+    captureCount,
+    wasPromotion
+  ) {
+  
+    animationLock = true;
+  
+  
+    for (
+      const step of chosen.path
+    ) {
+  
+      const piece =
+        board[
+          step.from.r
+        ][
+          step.from.c
+        ];
+  
+  
+      if (!piece) {
+        continue;
+      }
+  
+  
+      board[
+        step.from.r
+      ][
+        step.from.c
+      ] = null;
+  
+  
+      if (step.captured) {
+  
+        board[
+          step.captured.r
+        ][
+          step.captured.c
+        ] = null;
+  
+      }
+  
+  
+      const promoted =
+        !piece.king &&
+        step.to.r ===
+          KING_ROW[piece.color];
+  
+  
+      board[
+        step.to.r
+      ][
+        step.to.c
+      ] = {
+        color: piece.color,
+  
+        king:
+          piece.king ||
+          promoted
+      };
+  
+  
+      renderBoard(
+        step.to
+      );
+  
+  
+      await wait(500);
+  
+    }
+  
+  
+    animationLock = false;
+  
+  
+    renderCaptured();
+  
+  
+    if (captureCount > 0) {
+  
+      taphReact(
+        captureCount >= 2
+          ? "doubleCapture"
+          : "botCapture"
+      );
+  
+    }
+  
+  
+    if (wasPromotion) {
+  
+      taphReact("botKing");
+  
+    }
+  
+  
+    endTurn();
+  
+  }
+  
+  
+  // ============================================================
+  // PLAYER INTERACTION
+  // ============================================================
+  
+  function onSquareClick(
+    r,
+    c
+  ) {
+  
+    if (
+      gameOver ||
+      animationLock ||
+      currentTurn !== playerColor
+    ) {
+  
+      return;
+    }
+  
+  
+    const target =
+      legalTargets.find(
+        target =>
+          target.r === r &&
+          target.c === c
+      );
+  
+  
+    // ==========================================================
+    // CONTINUE A CAPTURE CHAIN
+    //
+    // This is the ONLY time a capture is forced.
+    // ==========================================================
+  
+    if (
+      selected &&
+      target
+    ) {
+  
+      applyPlayerStep(
+        selected.r,
+        selected.c,
+        target
+      );
+  
+      return;
+    }
+  
+  
+    // Once a capture has started, the player MUST
+    // continue with that same piece.
+  
+    if (forcedContinue) {
+      return;
+    }
+  
+  
+    const piece =
+      board[r][c];
+  
+  
+    if (
+      !piece ||
+      piece.color !== playerColor
+    ) {
+  
+      clearSelection();
+  
+      return;
+    }
+  
+  
+    // ==========================================================
+    // FIRST MOVE OF TURN
+    //
+    // Captures are OPTIONAL.
+    //
+    // If this piece can capture, we show the capture.
+    // If it cannot capture, we show normal moves.
+    //
+    // The important part is that we DO NOT check
+    // hasAnyCapture() here to force the player to capture.
+    // ==========================================================
+  
+    const jumps =
+      generateJumpsFrom(
+        board,
+        r,
+        c,
+        piece
+      );
+  
+  
+    const simples =
+      generateSimpleMovesFrom(
+        board,
+        r,
+        c,
+        piece
+      );
+  
+  
+    let moves = [];
+  
+  
+    // If this particular piece can capture,
+    // allow the capture.
+  
+    if (jumps.length > 0) {
+  
+      moves.push(
+        ...jumps.map(
+          jump => ({
+            r: jump.landing.r,
+            c: jump.landing.c,
+  
+            isJump: true,
+  
+            capR: jump.mid.r,
+            capC: jump.mid.c
+          })
+        )
+      );
+  
+    }
+  
+  
+    // Normal moves are ALSO allowed on the first move.
+  
+    moves.push(
+      ...simples.map(
+        move => ({
+          r: move.r,
+          c: move.c,
+  
+          isJump: false
+        })
+      )
+    );
+  
+  
+    if (moves.length === 0) {
+  
+      clearSelection();
+  
+      return;
+    }
+  
+  
+    selected = {
+      r,
+      c
+    };
+  
+  
+    legalTargets = moves;
+  
+  
+    renderBoard();
+  
+  }
+  
+  
+  function clearSelection() {
+  
+    selected = null;
+  
+    legalTargets = [];
+  
+    renderBoard();
+  }
+  
+  
+  async function applyPlayerStep(
+    fr,
+    fc,
+    target
+  ) {
+  
+    if (animationLock) {
+      return;
+    }
+  
+  
+    animationLock = true;
+  
+  
+    const piece =
+      board[fr][fc];
+  
+  
+    if (!piece) {
+  
+      animationLock = false;
+  
+      return;
+    }
+  
+  
+    board[fr][fc] = null;
+  
+  
+    let capturedPiece = null;
+  
+  
+    if (target.isJump) {
+  
+      capturedPiece =
+        board[
+          target.capR
+        ][
+          target.capC
+        ];
+  
+  
+      if (capturedPiece) {
   
         if (
-          capturedPiece?.color === "black"
+          capturedPiece.color === "black"
         ) {
   
           capturedBlack++;
   
-        } else if (
-          capturedPiece?.color === "white"
-        ) {
+        } else {
   
           capturedWhite++;
   
@@ -1239,219 +1596,104 @@
       }
   
   
-      animateBotTurn(
-        chosen,
-        captureCount,
-        wasPromotion
-      );
+      board[
+        target.capR
+      ][
+        target.capC
+      ] = null;
   
     }
   
   
-    async function animateBotTurn(
-      chosen,
-      captureCount,
-      wasPromotion
+    const promoted =
+      !piece.king &&
+      target.r ===
+        KING_ROW[piece.color];
+  
+  
+    board[
+      target.r
+    ][
+      target.c
+    ] = {
+  
+      color: piece.color,
+  
+      king:
+        piece.king ||
+        promoted
+    };
+  
+  
+    selected = null;
+  
+    legalTargets = [];
+  
+  
+    renderBoard(
+      target
+    );
+  
+  
+    await wait(500);
+  
+  
+    renderCaptured();
+  
+  
+    if (target.isJump) {
+  
+      taphReact("playerCapture");
+  
+    }
+  
+  
+    if (promoted) {
+  
+      taphReact("playerKing");
+  
+    }
+  
+  
+    // ==========================================================
+    // SECOND CAPTURE CHECK
+    //
+    // After the FIRST capture, if the same piece can
+    // capture again, the player MUST continue.
+    // ==========================================================
+  
+    if (
+      target.isJump &&
+      !promoted
     ) {
   
-      animationLock = true;
-  
-  
-      for (
-        const step of chosen.path
-      ) {
-  
-        const piece =
-          board[
-            step.from.r
-          ][
-            step.from.c
-          ];
-  
-  
-        if (!piece) {
-          continue;
-        }
-  
-  
+      const currentPiece =
         board[
-          step.from.r
+          target.r
         ][
-          step.from.c
-        ] = null;
+          target.c
+        ];
   
   
-        if (step.captured) {
-  
-          board[
-            step.captured.r
-          ][
-            step.captured.c
-          ] = null;
-  
-        }
+      const moreJumps =
+        generateJumpsFrom(
+          board,
+          target.r,
+          target.c,
+          currentPiece
+        );
   
   
-        const promoted =
-          !piece.king &&
-          step.to.r ===
-            KING_ROW[piece.color];
+      if (moreJumps.length > 0) {
   
-  
-        board[
-          step.to.r
-        ][
-          step.to.c
-        ] = {
-          color: piece.color,
-  
-          king:
-            piece.king ||
-            promoted
+        selected = {
+          r: target.r,
+          c: target.c
         };
   
   
-        renderBoard(
-          step.to
-        );
-  
-  
-        await wait(500);
-  
-      }
-  
-  
-      animationLock = false;
-  
-  
-      renderCaptured();
-  
-  
-      if (captureCount > 0) {
-  
-        taphReact(
-          captureCount >= 2
-            ? "doubleCapture"
-            : "botCapture"
-        );
-  
-      }
-  
-  
-      if (wasPromotion) {
-  
-        taphReact("botKing");
-  
-      }
-  
-  
-      endTurn();
-  
-    }
-  
-  
-    // ============================================================
-    // PLAYER INTERACTION
-    // ============================================================
-  
-    function onSquareClick(
-      r,
-      c
-    ) {
-  
-      if (
-        gameOver ||
-        animationLock ||
-        currentTurn !== playerColor
-      ) {
-  
-        return;
-      }
-  
-  
-      const target =
-        legalTargets.find(
-          target =>
-            target.r === r &&
-            target.c === c
-        );
-  
-  
-      if (
-        selected &&
-        target
-      ) {
-  
-        applyPlayerStep(
-          selected.r,
-          selected.c,
-          target
-        );
-  
-        return;
-      }
-  
-  
-      if (forcedContinue) {
-        return;
-      }
-  
-  
-      const piece =
-        board[r][c];
-  
-  
-      if (
-        !piece ||
-        piece.color !== playerColor
-      ) {
-  
-        clearSelection();
-  
-        return;
-      }
-  
-  
-      const mustCapture =
-        hasAnyCapture(
-          board,
-          playerColor
-        );
-  
-  
-      const jumps =
-        generateJumpsFrom(
-          board,
-          r,
-          c,
-          piece
-        );
-  
-  
-      const simples =
-        generateSimpleMovesFrom(
-          board,
-          r,
-          c,
-          piece
-        );
-  
-  
-      let moves;
-  
-  
-      if (mustCapture) {
-  
-        if (jumps.length === 0) {
-  
-          clearSelection();
-  
-          return;
-        }
-  
-  
-        moves =
-          jumps.map(
+        legalTargets =
+          moreJumps.map(
             jump => ({
               r: jump.landing.r,
               c: jump.landing.c,
@@ -1463,1124 +1705,925 @@
             })
           );
   
-      } else {
   
-        if (simples.length === 0) {
-  
-          clearSelection();
-  
-          return;
-        }
-  
-  
-        moves =
-          simples.map(
-            move => ({
-              r: move.r,
-              c: move.c,
-  
-              isJump: false
-            })
-          );
-  
-      }
-  
-  
-      selected = {
-        r,
-        c
-      };
-  
-  
-      legalTargets = moves;
-  
-  
-      renderBoard();
-  
-    }
-  
-  
-    function clearSelection() {
-  
-      selected = null;
-  
-      legalTargets = [];
-  
-      renderBoard();
-    }
-  
-  
-    async function applyPlayerStep(
-      fr,
-      fc,
-      target
-    ) {
-  
-      if (animationLock) {
-        return;
-      }
-  
-  
-      animationLock = true;
-  
-  
-      const piece =
-        board[fr][fc];
-  
-  
-      if (!piece) {
+        forcedContinue = true;
   
         animationLock = false;
   
+        renderBoard();
+  
+        taphReact("continueCapture");
+  
         return;
       }
   
-  
-      board[fr][fc] = null;
-  
-  
-      let capturedPiece = null;
+    }
   
   
-      if (target.isJump) {
+    forcedContinue = false;
   
-        capturedPiece =
-          board[
-            target.capR
-          ][
-            target.capC
-          ];
+    animationLock = false;
   
   
-        if (capturedPiece) {
+    endTurn();
   
-          if (
-            capturedPiece.color === "black"
-          ) {
-  
-            capturedBlack++;
-  
-          } else {
-  
-            capturedWhite++;
-  
-          }
-  
-        }
+  }
   
   
-        board[
-          target.capR
-        ][
-          target.capC
-        ] = null;
+  // ============================================================
+  // TURN FLOW
+  // ============================================================
   
-      }
+  function endTurn() {
   
-  
-      const promoted =
-        !piece.king &&
-        target.r ===
-          KING_ROW[piece.color];
+    currentTurn =
+      currentTurn === "black"
+        ? "white"
+        : "black";
   
   
-      board[
-        target.r
-      ][
-        target.c
-      ] = {
+    selected = null;
   
-        color: piece.color,
+    legalTargets = [];
   
-        king:
-          piece.king ||
-          promoted
-      };
+    forcedContinue = false;
   
   
-      selected = null;
+    renderBoard();
   
-      legalTargets = [];
+    renderCaptured();
   
   
-      renderBoard(
-        target
+    const winner =
+      checkGameOver();
+  
+  
+    if (winner) {
+  
+      showGameOver(winner);
+  
+      return;
+    }
+  
+  
+    updateStatus();
+  
+  
+    if (
+      currentTurn === botColor
+    ) {
+  
+      taphReact("botThinking");
+  
+  
+      setTimeout(
+        botMove,
+        650
       );
   
+    } else {
   
-      await wait(500);
+      taphReact("yourTurn");
   
+    }
   
-      renderCaptured();
-  
-  
-      if (target.isJump) {
-  
-        taphReact("playerCapture");
-  
-      }
+  }
   
   
-      if (promoted) {
+  function checkGameOver() {
   
-        taphReact("playerKing");
+    if (
+      countPieces(
+        board,
+        "black"
+      ) === 0
+    ) {
   
-      }
-  
-  
-      if (
-        target.isJump &&
-        !promoted
-      ) {
-  
-        const currentPiece =
-          board[
-            target.r
-          ][
-            target.c
-          ];
+      return "white";
+    }
   
   
-        const moreJumps =
-          generateJumpsFrom(
-            board,
-            target.r,
-            target.c,
-            currentPiece
+    if (
+      countPieces(
+        board,
+        "white"
+      ) === 0
+    ) {
+  
+      return "black";
+    }
+  
+  
+    if (
+      generateFullTurns(
+        board,
+        currentTurn
+      ).length === 0
+    ) {
+  
+      return currentTurn === "black"
+        ? "white"
+        : "black";
+  
+    }
+  
+  
+    return null;
+  }
+  
+  
+  // ============================================================
+  // GAME OVER
+  // ============================================================
+  
+  function showGameOver(
+    winnerColor
+  ) {
+  
+    gameOver = true;
+  
+  
+    const youWon =
+      winnerColor === playerColor;
+  
+  
+    overlayText.textContent =
+      youWon
+        ? "You win!"
+        : "The bot wins";
+  
+  
+    overlay.classList.remove(
+      "hidden"
+    );
+  
+  
+    // Record Checkers win in Supabase
+    if (youWon) {
+  
+      taphReact("win");
+  
+      recordCheckersWin();
+  
+    } else {
+  
+      taphReact("lose");
+  
+    }
+  
+  
+    updateStatus();
+  
+  }
+  
+  
+  // ============================================================
+  // RENDERING
+  // ============================================================
+  
+  function renderBoard(
+    movingTo = null
+  ) {
+  
+    boardEl.innerHTML = "";
+  
+  
+    const flipped =
+      playerColor === "black";
+  
+  
+    for (let r = 0; r < 8; r++) {
+  
+      for (let c = 0; c < 8; c++) {
+  
+        const square =
+          document.createElement("div");
+  
+  
+        const dark =
+          (r + c) % 2 === 1;
+  
+  
+        square.className =
+          "square " +
+          (
+            dark
+              ? "dark"
+              : "light"
           );
   
   
-        if (moreJumps.length > 0) {
-  
-          selected = {
-            r: target.r,
-            c: target.c
-          };
+        const displayR =
+          flipped
+            ? 7 - r
+            : r;
   
   
-          legalTargets =
-            moreJumps.map(
-              jump => ({
-                r: jump.landing.r,
-                c: jump.landing.c,
-  
-                isJump: true,
-  
-                capR: jump.mid.r,
-                capC: jump.mid.c
-              })
-            );
+        const displayC =
+          flipped
+            ? 7 - c
+            : c;
   
   
-          forcedContinue = true;
+        square.style.gridRowStart =
+          displayR + 1;
   
-          animationLock = false;
   
-          renderBoard();
+        square.style.gridColumnStart =
+          displayC + 1;
   
-          taphReact("continueCapture");
   
-          return;
+        if (
+          selected &&
+          selected.r === r &&
+          selected.c === c
+        ) {
+  
+          square.classList.add(
+            "selected-square"
+          );
+  
         }
   
-      }
   
+        if (
+          legalTargets.some(
+            target =>
+              target.r === r &&
+              target.c === c
+          )
+        ) {
   
-      forcedContinue = false;
+          square.classList.add(
+            "legal-target"
+          );
   
-      animationLock = false;
+        }
   
   
-      endTurn();
+        const piece =
+          board[r][c];
   
-    }
   
+        if (piece) {
   
-    // ============================================================
-    // TURN FLOW
-    // ============================================================
-  
-    function endTurn() {
-  
-      currentTurn =
-        currentTurn === "black"
-          ? "white"
-          : "black";
-  
-  
-      selected = null;
-  
-      legalTargets = [];
-  
-      forcedContinue = false;
-  
-  
-      renderBoard();
-  
-      renderCaptured();
-  
-  
-      const winner =
-        checkGameOver();
-  
-  
-      if (winner) {
-  
-        showGameOver(winner);
-  
-        return;
-      }
-  
-  
-      updateStatus();
-  
-  
-      if (
-        currentTurn === botColor
-      ) {
-  
-        taphReact("botThinking");
-  
-  
-        setTimeout(
-          botMove,
-          650
-        );
-  
-      } else {
-  
-        taphReact("yourTurn");
-  
-      }
-  
-    }
-  
-  
-    function checkGameOver() {
-  
-      if (
-        countPieces(
-          board,
-          "black"
-        ) === 0
-      ) {
-  
-        return "white";
-      }
-  
-  
-      if (
-        countPieces(
-          board,
-          "white"
-        ) === 0
-      ) {
-  
-        return "black";
-      }
-  
-  
-      if (
-        generateFullTurns(
-          board,
-          currentTurn
-        ).length === 0
-      ) {
-  
-        return currentTurn === "black"
-          ? "white"
-          : "black";
-  
-      }
-  
-  
-      return null;
-    }
-  
-  
-    // ============================================================
-    // GAME OVER
-    // ============================================================
-  
-    function showGameOver(
-      winnerColor
-    ) {
-  
-      gameOver = true;
-  
-  
-      const youWon =
-        winnerColor === playerColor;
-  
-  
-      overlayText.textContent =
-        youWon
-          ? "You win!"
-          : "The bot wins";
-  
-  
-      overlay.classList.remove(
-        "hidden"
-      );
-  
-  
-      // Record Checkers win in Supabase
-      if (youWon) {
-  
-        taphReact("win");
-  
-        recordCheckersWin();
-  
-      } else {
-  
-        taphReact("lose");
-  
-      }
-  
-  
-      updateStatus();
-  
-    }
-  
-  
-    // ============================================================
-    // RENDERING
-    // ============================================================
-  
-    function renderBoard(
-      movingTo = null
-    ) {
-  
-      boardEl.innerHTML = "";
-  
-  
-      const flipped =
-        playerColor === "black";
-  
-  
-      for (let r = 0; r < 8; r++) {
-  
-        for (let c = 0; c < 8; c++) {
-  
-          const square =
+          const pieceEl =
             document.createElement("div");
   
   
-          const dark =
-            (r + c) % 2 === 1;
-  
-  
-          square.className =
-            "square " +
+          pieceEl.className =
+            "piece " +
+            piece.color +
             (
-              dark
-                ? "dark"
-                : "light"
+              piece.king
+                ? " king"
+                : ""
             );
   
   
-          const displayR =
-            flipped
-              ? 7 - r
-              : r;
-  
-  
-          const displayC =
-            flipped
-              ? 7 - c
-              : c;
-  
-  
-          square.style.gridRowStart =
-            displayR + 1;
-  
-  
-          square.style.gridColumnStart =
-            displayC + 1;
-  
-  
           if (
-            selected &&
-            selected.r === r &&
-            selected.c === c
+            movingTo &&
+            movingTo.r === r &&
+            movingTo.c === c
           ) {
   
-            square.classList.add(
-              "selected-square"
+            pieceEl.classList.add(
+              "moving"
             );
   
           }
   
   
-          if (
-            legalTargets.some(
-              target =>
-                target.r === r &&
-                target.c === c
+          square.appendChild(
+            pieceEl
+          );
+  
+        }
+  
+  
+        square.addEventListener(
+          "click",
+          () =>
+            onSquareClick(
+              r,
+              c
             )
-          ) {
-  
-            square.classList.add(
-              "legal-target"
-            );
-  
-          }
+        );
   
   
-          const piece =
-            board[r][c];
+        boardEl.appendChild(
+          square
+        );
+  
+      }
+  
+    }
+  
+  }
   
   
-          if (piece) {
+  function renderCaptured() {
   
-            const pieceEl =
-              document.createElement("div");
-  
-  
-            pieceEl.className =
-              "piece " +
-              piece.color +
-              (
-                piece.king
-                  ? " king"
-                  : ""
-              );
+    capturedBlackEl.innerHTML = "";
   
   
-            if (
-              movingTo &&
-              movingTo.r === r &&
-              movingTo.c === c
-            ) {
+    for (
+      let i = 0;
+      i < capturedBlack;
+      i++
+    ) {
   
-              pieceEl.classList.add(
-                "moving"
-              );
+      const dot =
+        document.createElement("div");
   
-            }
+      dot.className =
+        "captured-piece-dot black";
+  
+      capturedBlackEl.appendChild(
+        dot
+      );
+  
+    }
   
   
-            square.appendChild(
-              pieceEl
-            );
-  
-          }
+    capturedWhiteEl.innerHTML = "";
   
   
-          square.addEventListener(
-            "click",
+    for (
+      let i = 0;
+      i < capturedWhite;
+      i++
+    ) {
+  
+      const dot =
+        document.createElement("div");
+  
+      dot.className =
+        "captured-piece-dot white";
+  
+      capturedWhiteEl.appendChild(
+        dot
+      );
+  
+    }
+  
+  }
+  
+  
+  function updateStatus() {
+  
+    const isPlayerTurn =
+      currentTurn === playerColor;
+  
+  
+    turnLabel.textContent =
+      (
+        currentTurn === "black"
+          ? "Black"
+          : "White"
+      ) +
+      " to move";
+  
+  
+    turnDot.classList.toggle(
+      "white",
+      currentTurn === "white"
+    );
+  
+  
+    if (gameOver) {
+  
+      statusEl.textContent =
+        "Game over";
+  
+    } else if (forcedContinue) {
+  
+      statusEl.textContent =
+        "Continue the jump";
+  
+    } else if (isPlayerTurn) {
+  
+      statusEl.textContent =
+        "Your move";
+  
+    } else {
+  
+      statusEl.textContent =
+        "Bot is thinking…";
+  
+    }
+  
+  }
+  
+  
+  // ============================================================
+  // GAME START
+  // ============================================================
+  
+  function startGame() {
+  
+    board =
+      initBoard();
+  
+    currentTurn =
+      "white";
+  
+    selected = null;
+  
+    legalTargets = [];
+  
+    forcedContinue = false;
+  
+    gameOver = false;
+  
+    animationLock = false;
+  
+    winRecorded = false;
+  
+    capturedBlack = 0;
+  
+    capturedWhite = 0;
+  
+  
+    setupScreen.classList.add(
+      "hidden"
+    );
+  
+    gameScreen.classList.remove(
+      "hidden"
+    );
+  
+    chatPanel.classList.remove(
+      "hidden"
+    );
+  
+    overlay.classList.add(
+      "hidden"
+    );
+  
+  
+    clearChat();
+  
+    renderBoard();
+  
+    renderCaptured();
+  
+    updateStatus();
+  
+  
+    addTaphMessage(
+      "👀"
+    );
+  
+  
+    setTimeout(
+      () => {
+  
+        if (
+          currentTurn === playerColor
+        ) {
+  
+          addTaphMessage(
+            "👍"
+          );
+  
+        } else {
+  
+          addTaphMessage(
+            "😈"
+          );
+  
+        }
+  
+      },
+      500
+    );
+  
+  
+    if (
+      currentTurn === botColor
+    ) {
+  
+      setTimeout(
+        botMove,
+        650
+      );
+  
+    }
+  
+  }
+  
+  
+  // ============================================================
+  // CHAT
+  // ============================================================
+  
+  function clearChat() {
+  
+    chatMessages.innerHTML = "";
+  
+  }
+  
+  
+  function addTaphMessage(
+    text
+  ) {
+  
+    const wrapper =
+      document.createElement("div");
+  
+    wrapper.className =
+      "chat-message taph-message";
+  
+  
+    const avatar =
+      document.createElement("div");
+  
+    avatar.className =
+      "message-avatar";
+  
+    avatar.textContent =
+      "T";
+  
+  
+    const bubble =
+      document.createElement("div");
+  
+    bubble.className =
+      "message-bubble";
+  
+    bubble.textContent =
+      text;
+  
+  
+    wrapper.appendChild(
+      avatar
+    );
+  
+    wrapper.appendChild(
+      bubble
+    );
+  
+  
+    chatMessages.appendChild(
+      wrapper
+    );
+  
+  
+    chatMessages.scrollTop =
+      chatMessages.scrollHeight;
+  
+  }
+  
+  
+  function addPlayerMessage(
+    text
+  ) {
+  
+    const wrapper =
+      document.createElement("div");
+  
+    wrapper.className =
+      "chat-message player-message";
+  
+  
+    const bubble =
+      document.createElement("div");
+  
+    bubble.className =
+      "message-bubble";
+  
+    bubble.textContent =
+      text;
+  
+  
+    wrapper.appendChild(
+      bubble
+    );
+  
+  
+    chatMessages.appendChild(
+      wrapper
+    );
+  
+  
+    chatMessages.scrollTop =
+      chatMessages.scrollHeight;
+  
+  }
+  
+  
+  function taphTyping(
+    callback
+  ) {
+  
+    const wrapper =
+      document.createElement("div");
+  
+    wrapper.className =
+      "chat-message taph-message";
+  
+  
+    const avatar =
+      document.createElement("div");
+  
+    avatar.className =
+      "message-avatar";
+  
+    avatar.textContent =
+      "T";
+  
+  
+    const bubble =
+      document.createElement("div");
+  
+    bubble.className =
+      "message-bubble typing-bubble";
+  
+  
+    for (
+      let i = 0;
+      i < 3;
+      i++
+    ) {
+  
+      const dot =
+        document.createElement("span");
+  
+      bubble.appendChild(
+        dot
+      );
+  
+    }
+  
+  
+    wrapper.appendChild(
+      avatar
+    );
+  
+    wrapper.appendChild(
+      bubble
+    );
+  
+  
+    chatMessages.appendChild(
+      wrapper
+    );
+  
+  
+    chatMessages.scrollTop =
+      chatMessages.scrollHeight;
+  
+  
+    setTimeout(
+      () => {
+  
+        wrapper.remove();
+  
+        callback();
+  
+      },
+      450
+    );
+  
+  }
+  
+  
+  function taphReact(
+    event
+  ) {
+  
+    const reactions = {
+  
+      playerCapture: [
+        "💥",
+        "👀",
+        "😳"
+      ],
+  
+      botCapture: [
+        "😰",
+        "💀",
+        "👀"
+      ],
+  
+      doubleCapture: [
+        "💥💥",
+        "😳",
+        "🔥"
+      ],
+  
+      continueCapture: [
+        "👀",
+        "👉",
+        "💥"
+      ],
+  
+      playerKing: [
+        "👑",
+        "😳✨",
+        "🔥👑"
+      ],
+  
+      botKing: [
+        "😰",
+        "👀",
+        "👑"
+      ],
+  
+      botThinking: [
+        "👀",
+        "🤔",
+        "..."
+      ],
+  
+      yourTurn: [
+        "👀",
+        "👍"
+      ],
+  
+      win: [
+        "🎉",
+        "👑",
+        "🙏✨"
+      ],
+  
+      lose: [
+        "😰",
+        "💀",
+        "😭"
+      ]
+  
+    };
+  
+  
+    const choices =
+      reactions[event];
+  
+  
+    if (
+      !choices ||
+      choices.length === 0
+    ) {
+  
+      return;
+    }
+  
+  
+    const message =
+      choices[
+        Math.floor(
+          Math.random() *
+          choices.length
+        )
+      ];
+  
+  
+    taphTyping(
+      () =>
+        addTaphMessage(
+          message
+        )
+    );
+  
+  }
+  
+  
+  // ============================================================
+  // PLAYER CHAT INPUT
+  // ============================================================
+  
+  function sendChat() {
+  
+    const text =
+      chatInput.value.trim();
+  
+  
+    if (!text) {
+      return;
+    }
+  
+  
+    addPlayerMessage(
+      text
+    );
+  
+  
+    chatInput.value = "";
+  
+  
+    setTimeout(
+      () => {
+  
+        const lower =
+          text.toLowerCase();
+  
+  
+        if (
+          lower.includes("hi") ||
+          lower.includes("hello") ||
+          lower.includes("hey")
+        ) {
+  
+          taphReact("yourTurn");
+  
+        } else if (
+          lower.includes("help")
+        ) {
+  
+          taphReact("yourTurn");
+  
+        } else if (
+          lower.includes("gg") ||
+          lower.includes("good game")
+        ) {
+  
+          taphReact("win");
+  
+        } else {
+  
+          const random =
+            [
+              "👀",
+              "👍",
+              "🤨",
+              "😐",
+              "🎃",
+              "..."
+            ];
+  
+  
+          taphTyping(
             () =>
-              onSquareClick(
-                r,
-                c
+              addTaphMessage(
+                random[
+                  Math.floor(
+                    Math.random() *
+                    random.length
+                  )
+                ]
               )
           );
   
-  
-          boardEl.appendChild(
-            square
-          );
-  
         }
   
-      }
+      },
+      300
+    );
   
-    }
+  }
   
   
-    function renderCaptured() {
+  chatSend.addEventListener(
+    "click",
+    sendChat
+  );
   
-      capturedBlackEl.innerHTML = "";
   
-  
-      for (
-        let i = 0;
-        i < capturedBlack;
-        i++
-      ) {
-  
-        const dot =
-          document.createElement("div");
-  
-        dot.className =
-          "captured-piece-dot black";
-  
-        capturedBlackEl.appendChild(
-          dot
-        );
-  
-      }
-  
-  
-      capturedWhiteEl.innerHTML = "";
-  
-  
-      for (
-        let i = 0;
-        i < capturedWhite;
-        i++
-      ) {
-  
-        const dot =
-          document.createElement("div");
-  
-        dot.className =
-          "captured-piece-dot white";
-  
-        capturedWhiteEl.appendChild(
-          dot
-        );
-  
-      }
-  
-    }
-  
-  
-    function updateStatus() {
-  
-      const isPlayerTurn =
-        currentTurn === playerColor;
-  
-  
-      turnLabel.textContent =
-        (
-          currentTurn === "black"
-            ? "Black"
-            : "White"
-        ) +
-        " to move";
-  
-  
-      turnDot.classList.toggle(
-        "white",
-        currentTurn === "white"
-      );
-  
-  
-      if (gameOver) {
-  
-        statusEl.textContent =
-          "Game over";
-  
-      } else if (forcedContinue) {
-  
-        statusEl.textContent =
-          "Continue the jump";
-  
-      } else if (isPlayerTurn) {
-  
-        statusEl.textContent =
-          "Your move";
-  
-      } else {
-  
-        statusEl.textContent =
-          "Bot is thinking…";
-  
-      }
-  
-    }
-  
-  
-    // ============================================================
-    // GAME START
-    // ============================================================
-  
-    function startGame() {
-  
-      board =
-        initBoard();
-  
-      currentTurn =
-        "white";
-  
-      selected = null;
-  
-      legalTargets = [];
-  
-      forcedContinue = false;
-  
-      gameOver = false;
-  
-      animationLock = false;
-  
-      winRecorded = false;
-  
-      capturedBlack = 0;
-  
-      capturedWhite = 0;
-  
-  
-      setupScreen.classList.add(
-        "hidden"
-      );
-  
-      gameScreen.classList.remove(
-        "hidden"
-      );
-  
-      chatPanel.classList.remove(
-        "hidden"
-      );
-  
-      overlay.classList.add(
-        "hidden"
-      );
-  
-  
-      clearChat();
-  
-      renderBoard();
-  
-      renderCaptured();
-  
-      updateStatus();
-  
-  
-      addTaphMessage(
-        "👀"
-      );
-  
-  
-      setTimeout(
-        () => {
-  
-          if (
-            currentTurn === playerColor
-          ) {
-  
-            addTaphMessage(
-              "👍"
-            );
-  
-          } else {
-  
-            addTaphMessage(
-              "😈"
-            );
-  
-          }
-  
-        },
-        500
-      );
-  
+  chatInput.addEventListener(
+    "keydown",
+    (event) => {
   
       if (
-        currentTurn === botColor
+        event.key === "Enter"
       ) {
   
+        sendChat();
+  
+      }
+  
+    }
+  );
+  
+  
+  // ============================================================
+  // UTILITY
+  // ============================================================
+  
+  function wait(ms) {
+  
+    return new Promise(
+      resolve =>
         setTimeout(
-          botMove,
-          650
-        );
-  
-      }
-  
-    }
-  
-  
-    // ============================================================
-    // CHAT
-    // ============================================================
-  
-    function clearChat() {
-  
-      chatMessages.innerHTML = "";
-  
-    }
-  
-  
-    function addTaphMessage(
-      text
-    ) {
-  
-      const wrapper =
-        document.createElement("div");
-  
-      wrapper.className =
-        "chat-message taph-message";
-  
-  
-      const avatar =
-        document.createElement("div");
-  
-      avatar.className =
-        "message-avatar";
-  
-      avatar.textContent =
-        "T";
-  
-  
-      const bubble =
-        document.createElement("div");
-  
-      bubble.className =
-        "message-bubble";
-  
-      bubble.textContent =
-        text;
-  
-  
-      wrapper.appendChild(
-        avatar
-      );
-  
-      wrapper.appendChild(
-        bubble
-      );
-  
-  
-      chatMessages.appendChild(
-        wrapper
-      );
-  
-  
-      chatMessages.scrollTop =
-        chatMessages.scrollHeight;
-  
-    }
-  
-  
-    function addPlayerMessage(
-      text
-    ) {
-  
-      const wrapper =
-        document.createElement("div");
-  
-      wrapper.className =
-        "chat-message player-message";
-  
-  
-      const bubble =
-        document.createElement("div");
-  
-      bubble.className =
-        "message-bubble";
-  
-      bubble.textContent =
-        text;
-  
-  
-      wrapper.appendChild(
-        bubble
-      );
-  
-  
-      chatMessages.appendChild(
-        wrapper
-      );
-  
-  
-      chatMessages.scrollTop =
-        chatMessages.scrollHeight;
-  
-    }
-  
-  
-    function taphTyping(
-      callback
-    ) {
-  
-      const wrapper =
-        document.createElement("div");
-  
-      wrapper.className =
-        "chat-message taph-message";
-  
-  
-      const avatar =
-        document.createElement("div");
-  
-      avatar.className =
-        "message-avatar";
-  
-      avatar.textContent =
-        "T";
-  
-  
-      const bubble =
-        document.createElement("div");
-  
-      bubble.className =
-        "message-bubble typing-bubble";
-  
-  
-      for (
-        let i = 0;
-        i < 3;
-        i++
-      ) {
-  
-        const dot =
-          document.createElement("span");
-  
-        bubble.appendChild(
-          dot
-        );
-  
-      }
-  
-  
-      wrapper.appendChild(
-        avatar
-      );
-  
-      wrapper.appendChild(
-        bubble
-      );
-  
-  
-      chatMessages.appendChild(
-        wrapper
-      );
-  
-  
-      chatMessages.scrollTop =
-        chatMessages.scrollHeight;
-  
-  
-      setTimeout(
-        () => {
-  
-          wrapper.remove();
-  
-          callback();
-  
-        },
-        450
-      );
-  
-    }
-  
-  
-    function taphReact(
-      event
-    ) {
-  
-      const reactions = {
-  
-        playerCapture: [
-          "💥",
-          "👀",
-          "😳"
-        ],
-  
-        botCapture: [
-          "😰",
-          "💀",
-          "👀"
-        ],
-  
-        doubleCapture: [
-          "💥💥",
-          "😳",
-          "🔥"
-        ],
-  
-        continueCapture: [
-          "👀",
-          "👉",
-          "💥"
-        ],
-  
-        playerKing: [
-          "👑",
-          "😳✨",
-          "🔥👑"
-        ],
-  
-        botKing: [
-          "😰",
-          "👀",
-          "👑"
-        ],
-  
-        botThinking: [
-          "👀",
-          "🤔",
-          "..."
-        ],
-  
-        yourTurn: [
-          "👀",
-          "👍"
-        ],
-  
-        win: [
-          "🎉",
-          "👑",
-          "🙏✨"
-        ],
-  
-        lose: [
-          "😰",
-          "💀",
-          "😭"
-        ]
-  
-      };
-  
-  
-      const choices =
-        reactions[event];
-  
-  
-      if (
-        !choices ||
-        choices.length === 0
-      ) {
-  
-        return;
-      }
-  
-  
-      const message =
-        choices[
-          Math.floor(
-            Math.random() *
-            choices.length
-          )
-        ];
-  
-  
-      taphTyping(
-        () =>
-          addTaphMessage(
-            message
-          )
-      );
-  
-    }
-  
-  
-    // ============================================================
-    // PLAYER CHAT INPUT
-    // ============================================================
-  
-    function sendChat() {
-  
-      const text =
-        chatInput.value.trim();
-  
-  
-      if (!text) {
-        return;
-      }
-  
-  
-      addPlayerMessage(
-        text
-      );
-  
-  
-      chatInput.value = "";
-  
-  
-      setTimeout(
-        () => {
-  
-          const lower =
-            text.toLowerCase();
-  
-  
-          if (
-            lower.includes("hi") ||
-            lower.includes("hello") ||
-            lower.includes("hey")
-          ) {
-  
-            taphReact("yourTurn");
-  
-          } else if (
-            lower.includes("help")
-          ) {
-  
-            taphReact("yourTurn");
-  
-          } else if (
-            lower.includes("gg") ||
-            lower.includes("good game")
-          ) {
-  
-            taphReact("win");
-  
-          } else {
-  
-            const random =
-              [
-                "👀",
-                "👍",
-                "🤨",
-                "😐",
-                "🎃",
-                "..."
-              ];
-  
-  
-            taphTyping(
-              () =>
-                addTaphMessage(
-                  random[
-                    Math.floor(
-                      Math.random() *
-                      random.length
-                    )
-                  ]
-                )
-            );
-  
-          }
-  
-        },
-        300
-      );
-  
-    }
-  
-  
-    chatSend.addEventListener(
-      "click",
-      sendChat
+          resolve,
+          ms
+        )
     );
   
-  
-    chatInput.addEventListener(
-      "keydown",
-      (event) => {
-  
-        if (
-          event.key === "Enter"
-        ) {
-  
-          sendChat();
-  
-        }
-  
-      }
-    );
+  }
   
   
-    // ============================================================
-    // UTILITY
-    // ============================================================
+  // ============================================================
+  // TEST CHECKERS WIN
+  // ============================================================
   
-    function wait(ms) {
+  window.testCheckersWin =
+    async function (mode) {
   
-      return new Promise(
-        resolve =>
-          setTimeout(
-            resolve,
-            ms
-          )
-      );
-  
-    }
-    window.testCheckersWin = async function (mode) {
       difficulty = mode;
+  
       winRecorded = false;
-    
+  
       console.log(
         `Testing ${mode}: should add ${
           mode === "hard"
@@ -2590,8 +2633,10 @@
               : 1
         } win(s).`
       );
-    
+  
       await recordCheckersWin();
+  
     };
-    
-    })();
+  
+  
+  })();
