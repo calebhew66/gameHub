@@ -672,9 +672,7 @@ GAME CATEGORY
   border-top: 1px solid var(--border);
 }
 
-.game-category:last-child {
-  border-bottom: 1px solid var(--border);
-}
+
 
 .category__header {
   display: grid;
