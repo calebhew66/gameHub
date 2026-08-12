@@ -2396,15 +2396,16 @@
     const reactions = {
   
       playerCapture: [
-        "💥",
-        "👀",
-        "😳"
+        "😡",
+        "💣💥",
+        "ඞ"
       ],
   
       botCapture: [
-        "😰",
+        "👎",
         "💀",
-        "👀"
+        "👀",
+        "😂"
       ],
   
       doubleCapture: [
