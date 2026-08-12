@@ -1,0 +1,420 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Chess</title>
+
+  <link rel="stylesheet" href="achess.css">
+</head>
+
+<body>
+
+  <!-- ===================== MAIN LAYOUT ===================== -->
+
+  <div class="game-layout">
+
+
+    <!-- ===================== CHESS SETUP ===================== -->
+
+    <main id="setup-screen" class="screen">
+
+      <section class="setup-card">
+
+        <p class="eyebrow">
+          Classic board game
+        </p>
+
+        <h1 class="title">
+          Chess
+        </h1>
+
+
+        <!-- COLOR -->
+
+        <div class="setup-section">
+
+          <h2 class="section-label">
+            Choose your color
+          </h2>
+
+          <div class="option-row">
+
+            <button
+              class="option-btn color-option"
+              data-color="white"
+              type="button"
+            >
+              <span class="option-swatch swatch-white"></span>
+              White
+            </button>
+
+            <button
+              class="option-btn color-option"
+              data-color="black"
+              type="button"
+            >
+              <span class="option-swatch swatch-black"></span>
+              Black
+            </button>
+
+            <button
+              class="option-btn color-option"
+              data-color="random"
+              type="button"
+            >
+              <span class="option-swatch swatch-random"></span>
+              Random
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- DIFFICULTY -->
+
+        <div class="setup-section">
+
+          <h2 class="section-label">
+            Choose difficulty
+          </h2>
+
+          <div class="option-row">
+
+            <button
+              class="option-btn difficulty-option"
+              data-difficulty="easy"
+              type="button"
+            >
+              Easy
+            </button>
+
+            <button
+              class="option-btn difficulty-option"
+              data-difficulty="medium"
+              type="button"
+            >
+              Medium
+            </button>
+
+            <button
+              class="option-btn difficulty-option"
+              data-difficulty="hard"
+              type="button"
+            >
+              Hard
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <button
+          id="start-btn"
+          class="start-btn"
+          type="button"
+          disabled
+        >
+          Start Game
+        </button>
+
+      </section>
+
+    </main>
+
+
+    <!-- ===================== CHESS GAME ===================== -->
+
+    <main
+      id="game-screen"
+      class="screen hidden"
+    >
+
+      <div class="game-wrap">
+
+
+        <!-- GAME HEADER -->
+
+        <header class="game-header">
+
+          <div>
+
+            <p class="eyebrow">
+              Classic chess
+            </p>
+
+            <h1 class="title small">
+              Chess
+            </h1>
+
+            <p
+              id="status"
+              class="status-text"
+            >
+              White to move
+            </p>
+
+          </div>
+
+
+          <div class="header-right">
+
+            <div class="turn-pill">
+
+              <span
+                id="turn-dot"
+                class="turn-dot white"
+              ></span>
+
+              <span id="turn-label">
+                White to move
+              </span>
+
+            </div>
+
+
+            <button
+              id="new-game-btn"
+              class="ghost-btn"
+              type="button"
+            >
+              New Game
+            </button>
+
+          </div>
+
+        </header>
+
+
+        <!-- BOARD -->
+
+        <section class="board-frame">
+
+          <div
+            id="board"
+            aria-label="Chess board"
+          ></div>
+
+        </section>
+
+
+        <!-- CAPTURED PIECES -->
+
+        <section class="captured-row">
+
+          <div class="captured-group">
+
+            <div class="captured-label">
+              Black captured
+            </div>
+
+            <div
+              id="captured-black"
+              class="captured-pieces"
+            ></div>
+
+          </div>
+
+
+          <div class="captured-group">
+
+            <div class="captured-label">
+              White captured
+            </div>
+
+            <div
+              id="captured-white"
+              class="captured-pieces"
+            ></div>
+
+          </div>
+
+        </section>
+
+
+      </div>
+
+    </main>
+
+
+    <!-- ===================== TAPH CHAT ===================== -->
+
+    <aside
+      id="chat-panel"
+      class="chat-panel hidden"
+    >
+
+      <div class="chat-header">
+
+        <div class="taph-avatar">
+          T
+        </div>
+
+        <div class="taph-info">
+
+          <div class="taph-name">
+            Taph
+          </div>
+
+          <div class="taph-status">
+
+            <span class="online-dot"></span>
+
+            Watching
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="chat-messages"
+        class="chat-messages"
+      >
+
+        <div class="chat-message taph-message">
+
+          <div class="message-avatar">
+            T
+          </div>
+
+          <div class="message-bubble">
+            👀
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="chat-input-area">
+
+        <input
+          id="chat-input"
+          class="chat-input"
+          type="text"
+          maxlength="100"
+          placeholder="Type a message..."
+          autocomplete="off"
+        >
+
+        <button
+          id="chat-send"
+          class="chat-send"
+          type="button"
+          aria-label="Send message"
+        >
+          ➤
+        </button>
+
+      </div>
+
+    </aside>
+
+
+  </div>
+
+
+  <!-- ===================== PROMOTION ===================== -->
+
+  <div
+    id="promotion-overlay"
+    class="overlay hidden"
+  >
+
+    <div class="promotion-card">
+
+      <p class="eyebrow">
+        Pawn promotion
+      </p>
+
+      <h2 class="overlay-title">
+        Choose a piece
+      </h2>
+
+      <div class="promotion-options">
+
+        <button
+          class="promotion-btn"
+          data-piece="q"
+          type="button"
+        >
+          ♕
+        </button>
+
+        <button
+          class="promotion-btn"
+          data-piece="r"
+          type="button"
+        >
+          ♖
+        </button>
+
+        <button
+          class="promotion-btn"
+          data-piece="b"
+          type="button"
+        >
+          ♗
+        </button>
+
+        <button
+          class="promotion-btn"
+          data-piece="n"
+          type="button"
+        >
+          ♘
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ===================== GAME OVER ===================== -->
+
+  <div
+    id="game-over-overlay"
+    class="overlay hidden"
+  >
+
+    <div class="overlay-card">
+
+      <h2
+        id="game-over-text"
+        class="overlay-title"
+      >
+        You win!
+      </h2>
+
+      <button
+        id="play-again-btn"
+        class="start-btn"
+        type="button"
+      >
+        Play Again
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <script src="achess.js"></script>
+
+</body>
+</html>
+```
