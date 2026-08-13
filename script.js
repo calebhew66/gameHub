@@ -6,14 +6,11 @@ import {
     createClient
 } from "https://esm.sh/@supabase/supabase-js@2";
 
-
 const supabaseUrl =
     "https://ijtclttmxnckpieqkaki.supabase.co";
 
-
 const supabaseKey =
     "sb_publishable_ntobIYEBKNJI3tPpfD_izQ_xLJ-n7UL";
-
 
 const supabase =
     createClient(
@@ -31,12 +28,10 @@ const themeToggle =
         "themeToggle"
     );
 
-
 const savedTheme =
     localStorage.getItem(
         "theme"
     );
-
 
 if (
     savedTheme === "dark"
@@ -53,8 +48,8 @@ if (
         "aria-pressed",
         "true"
     );
-}
 
+}
 
 themeToggle.addEventListener(
     "click",
@@ -65,12 +60,10 @@ themeToggle.addEventListener(
                 "dark-mode"
             );
 
-
         themeToggle.textContent =
             isDark
                 ? "○"
                 : "◐";
-
 
         themeToggle.setAttribute(
             "aria-pressed",
@@ -78,7 +71,6 @@ themeToggle.addEventListener(
                 ? "true"
                 : "false"
         );
-
 
         localStorage.setItem(
             "theme",
@@ -100,68 +92,35 @@ const chessGameButton =
         "chessGameButton"
     );
 
-
-const ticTacToeGameButton = 
+const ticTacToeGameButton =
     document.getElementById(
         "ticTacToeGameButton"
     );
-/* ========================================
-OPEN CHESS
-======================================== */
 
 const chessGame3Button =
     document.getElementById(
         "chessGame3Button"
     );
 
-chessGame3Button.addEventListener(
-    "click",
-    () => {
-
-        gameList.hidden = true;
-
-        gameScreen.hidden = false;
-
-        gameScreenTitle.textContent =
-            "Chess";
-
-        gameFrame.title =
-            "Chess game";
-
-        gameFrame.src =
-            "achess.html";
-
-        gameScreen.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
-
-    }
-);
-
 const backToGames =
     document.getElementById(
         "backToGames"
     );
-
 
 const gameList =
     document.getElementById(
         "gameList"
     );
 
-
 const gameScreen =
     document.getElementById(
         "gameScreen"
     );
 
-
 const gameFrame =
     document.getElementById(
         "gameFrame"
     );
-
 
 const gameScreenTitle =
     document.getElementById(
@@ -189,7 +148,6 @@ chessGameButton.addEventListener(
 
         gameFrame.src =
             "chess.html";
-
 
         gameScreen.scrollIntoView({
             behavior: "smooth",
@@ -221,7 +179,6 @@ ticTacToeGameButton.addEventListener(
         gameFrame.src =
             "tictactoe.html";
 
-
         gameScreen.scrollIntoView({
             behavior: "smooth",
             block: "start"
@@ -229,6 +186,40 @@ ticTacToeGameButton.addEventListener(
 
     }
 );
+
+
+/* ========================================
+   OPEN CHESS
+======================================== */
+
+if (chessGame3Button) {
+
+    chessGame3Button.addEventListener(
+        "click",
+        () => {
+
+            gameList.hidden = true;
+
+            gameScreen.hidden = false;
+
+            gameScreenTitle.textContent =
+                "Chess";
+
+            gameFrame.title =
+                "Chess game";
+
+            gameFrame.src =
+                "achess.html";
+
+            gameScreen.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+        }
+    );
+
+}
 
 
 /* ========================================
@@ -244,7 +235,6 @@ backToGames.addEventListener(
         gameList.hidden = false;
 
         gameFrame.src = "";
-
 
         gameList.scrollIntoView({
             behavior: "smooth",
@@ -264,24 +254,20 @@ const leaderboardButton =
         "leaderboardButton"
     );
 
-
 const leaderboardPanel =
     document.getElementById(
         "leaderboardPanel"
     );
-
 
 const leaderboardOverlay =
     document.getElementById(
         "leaderboardOverlay"
     );
 
-
 const closeLeaderboard =
     document.getElementById(
         "closeLeaderboard"
     );
-
 
 const leaderboardList =
     document.getElementById(
@@ -299,26 +285,21 @@ async function openLeaderboard() {
         "is-open"
     );
 
-
     leaderboardOverlay.hidden =
         false;
-
 
     leaderboardButton.setAttribute(
         "aria-expanded",
         "true"
     );
 
-
     leaderboardPanel.setAttribute(
         "aria-hidden",
         "false"
     );
 
-
     document.body.style.overflow =
         "hidden";
-
 
     requestAnimationFrame(() => {
 
@@ -327,8 +308,8 @@ async function openLeaderboard() {
 
     });
 
-
     await loadLeaderboard();
+
 }
 
 
@@ -342,26 +323,21 @@ function closeLeaderboardPanel() {
         "is-open"
     );
 
-
     leaderboardOverlay.style.opacity =
         "0";
-
 
     leaderboardButton.setAttribute(
         "aria-expanded",
         "false"
     );
 
-
     leaderboardPanel.setAttribute(
         "aria-hidden",
         "true"
     );
 
-
     document.body.style.overflow =
         "";
-
 
     setTimeout(() => {
 
@@ -377,6 +353,7 @@ function closeLeaderboardPanel() {
         }
 
     }, 350);
+
 }
 
 
@@ -389,12 +366,10 @@ leaderboardButton.addEventListener(
     openLeaderboard
 );
 
-
 closeLeaderboard.addEventListener(
     "click",
     closeLeaderboardPanel
 );
-
 
 leaderboardOverlay.addEventListener(
     "click",
@@ -437,7 +412,6 @@ async function loadLeaderboard() {
         </div>
     `;
 
-
     try {
 
         const {
@@ -448,7 +422,7 @@ async function loadLeaderboard() {
             .from("player_stats")
 
             .select(
-                "username, checkers_wins, tictactoe_wins, total_wins"
+                "username, checkers_wins, tictactoe_wins, chess_wins, total_wins"
             )
 
             .order(
@@ -468,7 +442,6 @@ async function loadLeaderboard() {
                 error
             );
 
-
             leaderboardList.innerHTML = `
                 <div class="leaderboard__error">
                     Could not load leaderboard.
@@ -476,6 +449,7 @@ async function loadLeaderboard() {
             `;
 
             return;
+
         }
 
 
@@ -491,6 +465,7 @@ async function loadLeaderboard() {
             `;
 
             return;
+
         }
 
 
@@ -529,6 +504,7 @@ async function loadLeaderboard() {
                                     <div
                                         class="leaderboard__games"
                                     >
+
                                         Checkers:
                                         ${Number(
                                             player.checkers_wins || 0
@@ -540,6 +516,14 @@ async function loadLeaderboard() {
                                         ${Number(
                                             player.tictactoe_wins || 0
                                         )}
+
+                                        &nbsp;•&nbsp;
+
+                                        Chess:
+                                        ${Number(
+                                            player.chess_wins || 0
+                                        )}
+
                                     </div>
 
                                 </div>
@@ -575,13 +559,14 @@ async function loadLeaderboard() {
             error
         );
 
-
         leaderboardList.innerHTML = `
             <div class="leaderboard__error">
                 Could not load leaderboard.
             </div>
         `;
+
     }
+
 }
 
 
@@ -617,6 +602,7 @@ function escapeHTML(value) {
             /'/g,
             "&#039;"
         );
+
 }
 
 
@@ -628,7 +614,6 @@ const year =
     document.getElementById(
         "year"
     );
-
 
 if (year) {
 
