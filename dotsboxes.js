@@ -246,7 +246,7 @@
     function getDotsBoxesWinReward() {
   
       if (difficulty === "hard") {
-        return 5;
+        return 3;
       }
   
       if (difficulty === "medium") {
