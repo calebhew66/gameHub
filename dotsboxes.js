@@ -2266,12 +2266,12 @@
         () => {
   
           addTaphMessage(
-            `You're ${playerColor}. ${playerColor === "blue" ? "You go first." : "Blue goes first."} Good luck 😈`
+            "😈"
           );
   
         },
         500
-      );
+      );    
   
     }
   
@@ -2619,8 +2619,7 @@
             "👀",
             "👍",
             "🤨",
-            "...",
-            "interesting"
+            "..."
           ];
   
   

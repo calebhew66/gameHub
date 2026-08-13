@@ -531,7 +531,12 @@
   .taph-avatar,
   .message-avatar {
     width: 34px;
+    min-width: 34px;
+  
     height: 34px;
+    min-height: 34px;
+  
+    flex-shrink: 0;
   
     display: flex;
   
@@ -543,6 +548,8 @@
     background: #334155;
   
     font-weight: 800;
+  
+    line-height: 1;
   }
   
   .taph-name {
