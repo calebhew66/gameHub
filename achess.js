@@ -117,262 +117,188 @@
   
   
   /* =========================================================
-     SAVE CHESS WIN TO SUPABASE
-  ========================================================= */
-  
-  let chessWinSaved = false;
-  
-  
-  async function saveChessWin() {
-  
-      /*
-          Prevent accidentally saving the same game twice.
-      */
-  
-      if (chessWinSaved) {
-  
-          console.log(
-              "Chess win was already saved."
-          );
-  
-          return;
-  
-      }
-  
-  
-      chessWinSaved = true;
-  
-  
-      const username =
-          getUsername();
-  
-  
-      const reward =
-          getChessWinReward();
-  
-  
-      console.log(
-          `Saving ${reward} Chess win(s) for ${username}...`
-      );
-  
-  
-      /*
-          Wait briefly if the Supabase module hasn't
-          finished loading yet.
-      */
-  
-      let attempts = 0;
-  
-      while (
-          !supabaseReady &&
-          attempts < 30
-      ) {
-  
-          await wait(100);
-  
-          attempts++;
-  
-      }
-  
-  
-      if (!supabaseReady || !supabaseClient) {
-  
-          console.error(
-              "Supabase is not ready. Chess win was not saved."
-          );
-  
-          chessWinSaved = false;
-  
-          return;
-  
-      }
-  
-  
-      try {
-  
-          /*
-              Get the player's current stats.
-          */
-  
-          const {
-              data: existingPlayer,
-              error: selectError
-          } = await supabaseClient
-  
-              .from("player_stats")
-  
-              .select(
-                  "username, checkers_wins, tictactoe_wins, chess_wins, total_wins"
-              )
-  
-              .eq(
-                  "username",
-                  username
-              )
-  
-              .maybeSingle();
-  
-  
-          if (selectError) {
-  
-              console.error(
-                  "Could not find player stats:",
-                  selectError
-              );
-  
-              chessWinSaved = false;
-  
-              return;
-  
-          }
-  
-  
-          /*
-              If the player doesn't exist yet,
-              create their player_stats row.
-          */
-  
-          if (!existingPlayer) {
-  
-              const {
-                  error: insertError
-              } = await supabaseClient
-  
-                  .from("player_stats")
-  
-                  .insert({
-  
-                      username:
-                          username,
-  
-                      checkers_wins:
-                          0,
-  
-                      tictactoe_wins:
-                          0,
-  
-                      chess_wins:
-                          reward,
-  
-                      total_wins:
-                          reward
-  
-                  });
-  
-  
-              if (insertError) {
-  
-                  console.error(
-                      "Could not create player stats:",
-                      insertError
-                  );
-  
-                  chessWinSaved = false;
-  
-                  return;
-  
-              }
-  
-  
-              console.log(
-                  `Created ${username} with ${reward} Chess win(s).`
-              );
-  
-  
-              return;
-  
-          }
-  
-  
-          /*
-              Player already exists.
-              Add the reward to their current totals.
-          */
-  
-          const currentChessWins =
-              Number(
-                  existingPlayer.chess_wins || 0
-              );
-  
-  
-          const currentTotalWins =
-              Number(
-                  existingPlayer.total_wins || 0
-              );
-  
-  
-          const newChessWins =
-              currentChessWins +
-              reward;
-  
-  
-          const newTotalWins =
-              currentTotalWins +
-              reward;
-  
-  
-          const {
-              error: updateError
-          } = await supabaseClient
-  
-              .from("player_stats")
-  
-              .update({
-  
-                  chess_wins:
-                      newChessWins,
-  
-                  total_wins:
-                      newTotalWins
-  
-              })
-  
-              .eq(
-                  "username",
-                  username
-              );
-  
-  
-          if (updateError) {
-  
-              console.error(
-                  "Could not update chess wins:",
-                  updateError
-              );
-  
-              chessWinSaved = false;
-  
-              return;
-  
-          }
-  
-  
-          console.log(
-              `Chess win saved! ${username}: +${reward}`
-          );
-  
-  
-          console.log(
-              `Chess wins: ${newChessWins}`
-          );
-  
-  
-          console.log(
-              `Total wins: ${newTotalWins}`
-          );
-  
-      } catch (error) {
-  
-          console.error(
-              "Unexpected error saving chess win:",
-              error
-          );
-  
-          chessWinSaved = false;
-  
-      }
-  
-  }
+   SAVE CHESS WIN TO SUPABASE
+========================================================= */
+
+let chessWinSaved = false;
+
+async function saveChessWin() {
+
+    if (chessWinSaved) {
+        console.log("Chess win was already saved.");
+        return;
+    }
+
+    chessWinSaved = true;
+
+    const username = getUsername();
+    const reward = getChessWinReward();
+
+    console.log(
+        `Saving ${reward} Chess win(s) for ${username}...`
+    );
+
+    let attempts = 0;
+
+    while (!supabaseReady && attempts < 30) {
+        await wait(100);
+        attempts++;
+    }
+
+    if (!supabaseReady || !supabaseClient) {
+
+        console.error(
+            "Supabase is not ready. Chess win was not saved."
+        );
+
+        chessWinSaved = false;
+        return;
+    }
+
+    try {
+
+        /* Find the player */
+        const {
+            data: existingPlayer,
+            error: selectError
+        } = await supabaseClient
+            .from("player_stats")
+            .select(
+                "id, username, checkers_wins, tictactoe_wins, chess_wins, created_at, total_wins"
+            )
+            .eq(
+                "username",
+                username
+            )
+            .maybeSingle();
+
+        if (selectError) {
+
+            console.error(
+                "Could not find player stats:",
+                selectError
+            );
+
+            chessWinSaved = false;
+            return;
+        }
+
+
+        /* =========================================
+           PLAYER DOES NOT EXIST
+        ========================================= */
+
+        if (!existingPlayer) {
+
+            const {
+                data: newPlayer,
+                error: insertError
+            } = await supabaseClient
+                .from("player_stats")
+                .insert({
+                    username: username,
+                    checkers_wins: 0,
+                    tictactoe_wins: 0,
+                    chess_wins: reward,
+                    total_wins: reward
+                })
+                .select()
+                .single();
+
+            if (insertError) {
+
+                console.error(
+                    "Could not create player stats:",
+                    insertError
+                );
+
+                chessWinSaved = false;
+                return;
+            }
+
+            console.log(
+                `Created ${username} with ${reward} Chess win(s).`
+            );
+
+            console.log(
+                "New player:",
+                newPlayer
+            );
+
+            return;
+        }
+
+
+        /* =========================================
+           PLAYER ALREADY EXISTS
+        ========================================= */
+
+        const currentChessWins =
+            Number(
+                existingPlayer.chess_wins || 0
+            );
+
+        const currentTotalWins =
+            Number(
+                existingPlayer.total_wins || 0
+            );
+
+
+        const newChessWins =
+            currentChessWins + reward;
+
+        const newTotalWins =
+            currentTotalWins + reward;
+
+
+        const {
+            error: updateError
+        } = await supabaseClient
+            .from("player_stats")
+            .update({
+                chess_wins: newChessWins,
+                total_wins: newTotalWins
+            })
+            .eq(
+                "id",
+                existingPlayer.id
+            );
+
+
+        if (updateError) {
+
+            console.error(
+                "Could not update chess wins:",
+                updateError
+            );
+
+            chessWinSaved = false;
+            return;
+        }
+
+
+        console.log(
+            `Chess win saved! ${username}: +${reward}`
+        );
+
+        console.log(
+            `Chess wins: ${newChessWins}`
+        );
+
+        console.log(
+            `Total wins: ${newTotalWins}`
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Unexpected error saving chess win:",
+            error
+        );
+
+        chessWinSaved = false;
+    }
+}
   
   
   /* =========================================================
