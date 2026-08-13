@@ -1,23 +1,28 @@
 /* ========================================
    SUPABASE
 ======================================== */
+
 console.log("newest version");
 
 import {
     createClient
 } from "https://esm.sh/@supabase/supabase-js@2";
 
+
 const supabaseUrl =
     "https://ijtclttmxnckpieqkaki.supabase.co";
 
+
 const supabaseKey =
     "sb_publishable_ntobIYEBKNJI3tPpfD_izQ_xLJ-n7UL";
+
 
 const supabase =
     createClient(
         supabaseUrl,
         supabaseKey
     );
+
 
 /* ========================================
    SHARED USERNAME
@@ -30,24 +35,33 @@ function getUsername() {
             "chgames_username"
         );
 
+
     if (!username) {
 
         username = prompt(
             "Enter your CHgames username:"
         );
 
+
         if (!username) {
+
             username = "Player";
+
         }
+
 
         username =
             username
                 .trim()
                 .slice(0, 20);
 
+
         if (!username) {
+
             username = "Player";
+
         }
+
 
         localStorage.setItem(
             "chgames_username",
@@ -56,13 +70,19 @@ function getUsername() {
 
     }
 
+
     return username;
 
 }
 
 
-/* Ask for username when Game Hub loads */
+/* ========================================
+   ASK FOR USERNAME WHEN GAME HUB LOADS
+======================================== */
+
 getUsername();
+
+
 /* ========================================
    THEME TOGGLE
 ======================================== */
@@ -72,10 +92,12 @@ const themeToggle =
         "themeToggle"
     );
 
+
 const savedTheme =
     localStorage.getItem(
         "theme"
     );
+
 
 if (
     savedTheme === "dark"
@@ -85,8 +107,10 @@ if (
         "dark-mode"
     );
 
+
     themeToggle.textContent =
         "○";
+
 
     themeToggle.setAttribute(
         "aria-pressed",
@@ -94,6 +118,7 @@ if (
     );
 
 }
+
 
 themeToggle.addEventListener(
     "click",
@@ -104,10 +129,12 @@ themeToggle.addEventListener(
                 "dark-mode"
             );
 
+
         themeToggle.textContent =
             isDark
                 ? "○"
                 : "◐";
+
 
         themeToggle.setAttribute(
             "aria-pressed",
@@ -115,6 +142,7 @@ themeToggle.addEventListener(
                 ? "true"
                 : "false"
         );
+
 
         localStorage.setItem(
             "theme",
@@ -136,41 +164,48 @@ const chessGameButton =
         "chessGameButton"
     );
 
+
 const ticTacToeGameButton =
     document.getElementById(
         "ticTacToeGameButton"
     );
+
 
 const chessGame3Button =
     document.getElementById(
         "chessGame3Button"
     );
 
-/* Dots and Boxes button */
+
 const game4Button =
     document.getElementById(
         "game4Button"
     );
+
 
 const backToGames =
     document.getElementById(
         "backToGames"
     );
 
+
 const gameList =
     document.getElementById(
         "gameList"
     );
+
 
 const gameScreen =
     document.getElementById(
         "gameScreen"
     );
 
+
 const gameFrame =
     document.getElementById(
         "gameFrame"
     );
+
 
 const gameScreenTitle =
     document.getElementById(
@@ -190,14 +225,18 @@ chessGameButton.addEventListener(
 
         gameScreen.hidden = false;
 
+
         gameScreenTitle.textContent =
             "Checkers";
+
 
         gameFrame.title =
             "Checkers game";
 
+
         gameFrame.src =
             "chess.html";
+
 
         gameScreen.scrollIntoView({
             behavior: "smooth",
@@ -220,14 +259,18 @@ ticTacToeGameButton.addEventListener(
 
         gameScreen.hidden = false;
 
+
         gameScreenTitle.textContent =
             "Tic-Tac-Toe";
+
 
         gameFrame.title =
             "Tic-Tac-Toe game";
 
+
         gameFrame.src =
             "tictactoe.html";
+
 
         gameScreen.scrollIntoView({
             behavior: "smooth",
@@ -252,14 +295,18 @@ if (chessGame3Button) {
 
             gameScreen.hidden = false;
 
+
             gameScreenTitle.textContent =
                 "Chess";
+
 
             gameFrame.title =
                 "Chess game";
 
+
             gameFrame.src =
                 "achess.html";
+
 
             gameScreen.scrollIntoView({
                 behavior: "smooth",
@@ -286,14 +333,18 @@ if (game4Button) {
 
             gameScreen.hidden = false;
 
+
             gameScreenTitle.textContent =
                 "Dots & Boxes";
+
 
             gameFrame.title =
                 "Dots & Boxes game";
 
+
             gameFrame.src =
                 "dotsboxes.html";
+
 
             gameScreen.scrollIntoView({
                 behavior: "smooth",
@@ -320,6 +371,7 @@ backToGames.addEventListener(
 
         gameFrame.src = "";
 
+
         gameList.scrollIntoView({
             behavior: "smooth",
             block: "start"
@@ -338,20 +390,24 @@ const leaderboardButton =
         "leaderboardButton"
     );
 
+
 const leaderboardPanel =
     document.getElementById(
         "leaderboardPanel"
     );
+
 
 const leaderboardOverlay =
     document.getElementById(
         "leaderboardOverlay"
     );
 
+
 const closeLeaderboard =
     document.getElementById(
         "closeLeaderboard"
     );
+
 
 const leaderboardList =
     document.getElementById(
@@ -369,21 +425,26 @@ async function openLeaderboard() {
         "is-open"
     );
 
+
     leaderboardOverlay.hidden =
         false;
+
 
     leaderboardButton.setAttribute(
         "aria-expanded",
         "true"
     );
 
+
     leaderboardPanel.setAttribute(
         "aria-hidden",
         "false"
     );
 
+
     document.body.style.overflow =
         "hidden";
+
 
     requestAnimationFrame(() => {
 
@@ -391,6 +452,7 @@ async function openLeaderboard() {
             "1";
 
     });
+
 
     await loadLeaderboard();
 
@@ -407,21 +469,26 @@ function closeLeaderboardPanel() {
         "is-open"
     );
 
+
     leaderboardOverlay.style.opacity =
         "0";
+
 
     leaderboardButton.setAttribute(
         "aria-expanded",
         "false"
     );
 
+
     leaderboardPanel.setAttribute(
         "aria-hidden",
         "true"
     );
 
+
     document.body.style.overflow =
         "";
+
 
     setTimeout(() => {
 
@@ -450,10 +517,12 @@ leaderboardButton.addEventListener(
     openLeaderboard
 );
 
+
 closeLeaderboard.addEventListener(
     "click",
     closeLeaderboardPanel
 );
+
 
 leaderboardOverlay.addEventListener(
     "click",
@@ -496,27 +565,29 @@ async function loadLeaderboard() {
         </div>
     `;
 
+
     try {
 
         const {
             data,
             error
-        } = await supabase
+        } =
+            await supabase
 
-            .from("player_stats")
+                .from("player_stats")
 
-            .select(
-                "username, checkers_wins, tictactoe_wins, chess_wins, dots_boxes_wins, total_wins"
-            )
+                .select(
+                    "username, checkers_wins, tictactoe_wins, chess_wins, dots_boxes_wins, total_wins"
+                )
 
-            .order(
-                "total_wins",
-                {
-                    ascending: false
-                }
-            )
+                .order(
+                    "total_wins",
+                    {
+                        ascending: false
+                    }
+                )
 
-            .limit(10);
+                .limit(10);
 
 
         if (error) {
@@ -526,11 +597,13 @@ async function loadLeaderboard() {
                 error
             );
 
+
             leaderboardList.innerHTML = `
                 <div class="leaderboard__error">
                     Could not load leaderboard.
                 </div>
             `;
+
 
             return;
 
@@ -547,6 +620,7 @@ async function loadLeaderboard() {
                     No players yet.
                 </div>
             `;
+
 
             return;
 
@@ -610,7 +684,7 @@ async function loadLeaderboard() {
 
                                         &nbsp;•&nbsp;
 
-                                        Dots & Boxes:
+                                        Dots &amp; Boxes:
                                         ${Number(
                                             player.dots_boxes_wins || 0
                                         )}
@@ -649,6 +723,7 @@ async function loadLeaderboard() {
             "Unexpected leaderboard error:",
             error
         );
+
 
         leaderboardList.innerHTML = `
             <div class="leaderboard__error">
@@ -705,6 +780,7 @@ const year =
     document.getElementById(
         "year"
     );
+
 
 if (year) {
 

@@ -3,19 +3,28 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
 
   <meta
     name="description"
     content="A collection of browser games."
   />
 
-  <title>Game Hub</title>
+  <title>CHgames</title>
 
-  <link rel="stylesheet" href="styles.css" />
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  />
 </head>
 
+
 <body>
+
 
   <!-- ========================================
        HEADER / NAVIGATION
@@ -23,7 +32,10 @@
 
   <header class="site-header">
 
-    <nav class="nav" aria-label="Main navigation">
+    <nav
+      class="nav"
+      aria-label="Main navigation"
+    >
 
       <a
         href="#top"
@@ -33,6 +45,7 @@
         CHgames
       </a>
 
+
       <ul class="nav__links">
 
         <li>
@@ -41,7 +54,9 @@
           </a>
         </li>
 
+
         <li>
+
           <button
             id="leaderboardButton"
             class="nav__leaderboard-button"
@@ -51,13 +66,15 @@
           >
             Leaderboard
           </button>
+
         </li>
 
       </ul>
 
+
       <button
-        class="nav__theme-toggle"
         id="themeToggle"
+        class="nav__theme-toggle"
         type="button"
         aria-label="Toggle dark mode"
         aria-pressed="false"
@@ -68,6 +85,7 @@
     </nav>
 
   </header>
+
 
 
   <!-- ========================================
@@ -81,6 +99,7 @@
   ></div>
 
 
+
   <!-- ========================================
        LEADERBOARD PANEL
   ========================================= -->
@@ -91,6 +110,9 @@
     aria-label="Leaderboard"
     aria-hidden="true"
   >
+
+
+    <!-- HEADER -->
 
     <div class="leaderboard-panel__header">
 
@@ -106,6 +128,7 @@
 
       </div>
 
+
       <button
         id="closeLeaderboard"
         class="leaderboard-panel__close"
@@ -118,6 +141,9 @@
     </div>
 
 
+
+    <!-- DESCRIPTION -->
+
     <div class="leaderboard-panel__description">
 
       <p>
@@ -126,6 +152,9 @@
 
     </div>
 
+
+
+    <!-- COLUMNS -->
 
     <div class="leaderboard-panel__columns">
 
@@ -139,6 +168,9 @@
 
     </div>
 
+
+
+    <!-- PLAYER LIST -->
 
     <div
       id="leaderboardList"
@@ -154,11 +186,13 @@
   </aside>
 
 
+
   <!-- ========================================
        MAIN
   ========================================= -->
 
   <main>
+
 
     <!-- ========================================
          HERO
@@ -172,9 +206,11 @@
 
       <div class="hero__content">
 
+
         <p class="hero__eyebrow">
           Game Hub
         </p>
+
 
         <h1
           id="hero-title"
@@ -185,9 +221,11 @@
           Have Fun.
         </h1>
 
+
         <p class="hero__tagline">
           A collection of games you can play right in your browser.
         </p>
+
 
         <div class="hero__actions">
 
@@ -205,6 +243,7 @@
     </section>
 
 
+
     <!-- ========================================
          GAMES
     ========================================= -->
@@ -214,6 +253,9 @@
       class="section"
       aria-labelledby="games-title"
     >
+
+
+      <!-- SECTION HEADER -->
 
       <header class="section__header">
 
@@ -231,9 +273,13 @@
       </header>
 
 
-      <!-- GAME LIST -->
+
+      <!-- ========================================
+           GAME LIST
+      ========================================= -->
 
       <div id="gameList">
+
 
         <!-- ========================================
              ARCADE
@@ -244,6 +290,9 @@
           class="game-category"
           aria-labelledby="arcade-title"
         >
+
+
+          <!-- CATEGORY HEADER -->
 
           <header class="category__header">
 
@@ -258,9 +307,17 @@
           </header>
 
 
+
+          <!-- ========================================
+               GAME GRID
+          ========================================= -->
+
           <div class="game-grid">
 
-            <!-- CHECKERS -->
+
+            <!-- ========================================
+                 CHECKERS
+            ========================================= -->
 
             <button
               id="chessGameButton"
@@ -271,6 +328,7 @@
               <span class="game-card__number">
                 01
               </span>
+
 
               <div>
 
@@ -284,6 +342,7 @@
 
               </div>
 
+
               <span
                 class="game-card__arrow"
                 aria-hidden="true"
@@ -294,7 +353,10 @@
             </button>
 
 
-            <!-- TIC-TAC-TOE -->
+
+            <!-- ========================================
+                 TIC-TAC-TOE
+            ========================================= -->
 
             <button
               id="ticTacToeGameButton"
@@ -305,6 +367,7 @@
               <span class="game-card__number">
                 02
               </span>
+
 
               <div>
 
@@ -318,6 +381,7 @@
 
               </div>
 
+
               <span
                 class="game-card__arrow"
                 aria-hidden="true"
@@ -328,41 +392,49 @@
             </button>
 
 
-           
-            <!-- CHESS -->
+
+            <!-- ========================================
+                 CHESS
+            ========================================= -->
 
             <button
-            id="chessGame3Button"
-            class="game-card"
-            type="button"
+              id="chessGame3Button"
+              class="game-card"
+              type="button"
             >
 
-            <span class="game-card__number">
-              03
-            </span>
+              <span class="game-card__number">
+                03
+              </span>
 
-            <div>
 
-              <h4>
-                Chess
-              </h4>
+              <div>
 
-              <p>
-                Simple chess game against a bot.
-              </p>
+                <h4>
+                  Chess
+                </h4>
 
-            </div>
+                <p>
+                  Simple chess game against a bot.
+                </p>
 
-            <span
-              class="game-card__arrow"
-              aria-hidden="true"
-            >
-              →
-            </span>
+              </div>
+
+
+              <span
+                class="game-card__arrow"
+                aria-hidden="true"
+              >
+                →
+              </span>
 
             </button>
 
-            <!-- GAME 4 — ots and boxes -->
+
+
+            <!-- ========================================
+                 DOTS & BOXES
+            ========================================= -->
 
             <button
               id="game4Button"
@@ -374,10 +446,11 @@
                 04
               </span>
 
+
               <div>
 
                 <h4>
-                  Dots and Boxes
+                  Dots &amp; Boxes
                 </h4>
 
                 <p>
@@ -385,6 +458,7 @@
                 </p>
 
               </div>
+
 
               <span
                 class="game-card__arrow"
@@ -395,11 +469,13 @@
 
             </button>
 
+
           </div>
 
         </section>
 
       </div>
+
 
 
       <!-- ========================================
@@ -413,6 +489,9 @@
         hidden
       >
 
+
+        <!-- BACK BUTTON -->
+
         <button
           id="backToGames"
           class="back-button"
@@ -422,21 +501,28 @@
         </button>
 
 
+
+        <!-- GAME HEADER -->
+
         <header class="game-screen__header">
 
           <p class="section__eyebrow">
             Now playing
           </p>
 
+
           <h2
             id="gameScreenTitle"
             class="section__title"
           >
-            Chess
+            Game
           </h2>
 
         </header>
 
+
+
+        <!-- GAME -->
 
         <div class="game-container">
 
@@ -449,11 +535,14 @@
 
         </div>
 
+
       </section>
+
 
     </section>
 
   </main>
+
 
 
   <!-- ========================================
@@ -463,18 +552,29 @@
   <footer class="site-footer">
 
     <p>
+
       &copy;
+
       <span id="year"></span>
+
       CHgames Game Hub.
+
     </p>
 
   </footer>
 
+
+
+  <!-- ========================================
+       JAVASCRIPT
+  ========================================= -->
 
   <script
     type="module"
     src="script.js"
   ></script>
 
+
 </body>
+
 </html>
