@@ -1,7 +1,8 @@
 /* ========================================
    SUPABASE
 ======================================== */
-console.log("newest version")
+console.log("newest version");
+
 import {
     createClient
 } from "https://esm.sh/@supabase/supabase-js@2";
@@ -229,41 +230,6 @@ if (chessGame3Button) {
 
 
 /* ========================================
-   OPEN DOTS AND BOXES
-======================================== */
-
-if (game4Button) {
-
-    game4Button.addEventListener(
-        "click",
-        () => {
-
-            gameList.hidden = true;
-
-            gameScreen.hidden = false;
-
-            gameScreenTitle.textContent =
-                "Dots and Boxes";
-
-            gameFrame.title =
-                "Dots and Boxes game";
-
-            gameFrame.src =
-                "dotsboxes.html";
-
-            gameScreen.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-
-        }
-    );
-
-}
-
-
-
-/* ========================================
    OPEN DOTS & BOXES
 ======================================== */
 
@@ -295,6 +261,8 @@ if (game4Button) {
     );
 
 }
+
+
 /* ========================================
    BACK TO GAMES
 ======================================== */
@@ -495,7 +463,7 @@ async function loadLeaderboard() {
             .from("player_stats")
 
             .select(
-                "username, checkers_wins, tictactoe_wins, chess_wins, total_wins"
+                "username, checkers_wins, tictactoe_wins, chess_wins, dots_boxes_wins, total_wins"
             )
 
             .order(
@@ -595,6 +563,13 @@ async function loadLeaderboard() {
                                         Chess:
                                         ${Number(
                                             player.chess_wins || 0
+                                        )}
+
+                                        &nbsp;•&nbsp;
+
+                                        Dots & Boxes:
+                                        ${Number(
+                                            player.dots_boxes_wins || 0
                                         )}
 
                                     </div>

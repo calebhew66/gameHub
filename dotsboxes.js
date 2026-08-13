@@ -430,10 +430,7 @@
             existingPlayer.dots_boxes_wins || 0
           );
   
-        const currentTotalWins =
-          Number(
-            existingPlayer.total_wins || 0
-          );
+        
   
   
         const {
@@ -447,8 +444,7 @@
               dots_boxes_wins:
                 currentDotsBoxesWins + reward,
   
-              total_wins:
-                currentTotalWins + reward
+              
   
             })
             .eq(
