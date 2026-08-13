@@ -84,6 +84,37 @@ getUsername();
 
 
 /* ========================================
+   CHANGE USERNAME
+======================================== */
+
+const changeUsernameButton =
+    document.getElementById(
+        "changeUsernameButton"
+    );
+
+if (changeUsernameButton) {
+
+    changeUsernameButton.addEventListener(
+        "click",
+        () => {
+
+            localStorage.removeItem(
+                "chgames_username"
+            );
+
+            const newUsername =
+                getUsername();
+
+            console.log(
+                "Username changed to:",
+                newUsername
+            );
+
+        }
+    );
+
+}
+/* ========================================
    THEME TOGGLE
 ======================================== */
 
