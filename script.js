@@ -1,7 +1,7 @@
 /* ========================================
    SUPABASE
 ======================================== */
-
+console.log("newest version")
 import {
     createClient
 } from "https://esm.sh/@supabase/supabase-js@2";
@@ -100,6 +100,12 @@ const ticTacToeGameButton =
 const chessGame3Button =
     document.getElementById(
         "chessGame3Button"
+    );
+
+/* Dots and Boxes button */
+const game4Button =
+    document.getElementById(
+        "game4Button"
     );
 
 const backToGames =
@@ -222,6 +228,73 @@ if (chessGame3Button) {
 }
 
 
+/* ========================================
+   OPEN DOTS AND BOXES
+======================================== */
+
+if (game4Button) {
+
+    game4Button.addEventListener(
+        "click",
+        () => {
+
+            gameList.hidden = true;
+
+            gameScreen.hidden = false;
+
+            gameScreenTitle.textContent =
+                "Dots and Boxes";
+
+            gameFrame.title =
+                "Dots and Boxes game";
+
+            gameFrame.src =
+                "dotsboxes.html";
+
+            gameScreen.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+        }
+    );
+
+}
+
+
+
+/* ========================================
+   OPEN DOTS & BOXES
+======================================== */
+
+if (game4Button) {
+
+    game4Button.addEventListener(
+        "click",
+        () => {
+
+            gameList.hidden = true;
+
+            gameScreen.hidden = false;
+
+            gameScreenTitle.textContent =
+                "Dots & Boxes";
+
+            gameFrame.title =
+                "Dots & Boxes game";
+
+            gameFrame.src =
+                "dotsboxes.html";
+
+            gameScreen.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+        }
+    );
+
+}
 /* ========================================
    BACK TO GAMES
 ======================================== */
@@ -621,3 +694,14 @@ if (year) {
         new Date().getFullYear();
 
 }
+
+
+/* ========================================
+   DEBUG USERNAME
+======================================== */
+
+console.log(
+    localStorage.getItem(
+        "chgames_username"
+    )
+);

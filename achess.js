@@ -49,55 +49,39 @@
   
   });
   
-  
-  /* =========================================================
-     USERNAME
-  ========================================================= */
-  
   function getUsername() {
-  
-      let username =
-          localStorage.getItem(
-              "chgames_username"
-          );
-  
-  
-      if (!username) {
-  
-          username =
-              prompt(
-                  "Enter your CHgames username:"
-              );
-  
-  
-          if (!username) {
-              username = "Player";
-          }
-  
-  
-          username =
-              username
-                  .trim()
-                  .slice(0, 20);
-  
-  
-          if (!username) {
-              username = "Player";
-          }
-  
-  
-          localStorage.setItem(
-              "chgames_username",
-              username
-          );
-  
-      }
-  
-  
-      return username;
-  }
-  
-  
+
+    let username =
+        localStorage.getItem("chgames_username");
+
+    if (!username) {
+
+        username = prompt(
+            "Enter your CHgames username:"
+        );
+
+        if (!username) {
+            username = "Player";
+        }
+
+        username = username
+            .trim()
+            .slice(0, 20);
+
+        if (!username) {
+            username = "Player";
+        }
+
+        localStorage.setItem(
+            "chgames_username",
+            username
+        );
+    }
+
+    console.log("Current username:", username);
+
+    return username;
+}
   /* =========================================================
      CHESS WIN REWARDS
   ========================================================= */
@@ -116,48 +100,76 @@
   }
   
   
-  /* =========================================================
-   SAVE CHESS WIN TO SUPABASE
-========================================================= */
-
-let chessWinSaved = false;
-
-async function saveChessWin() {
+ async function saveChessWin() {
 
     if (chessWinSaved) {
-        console.log("Chess win was already saved.");
+        console.log("Chess win already saved.");
         return;
     }
-
-    chessWinSaved = true;
 
     const username = getUsername();
     const reward = getChessWinReward();
 
     console.log(
-        `Saving ${reward} Chess win(s) for ${username}...`
+        "================================="
     );
+
+    console.log(
+        "CHESS WIN DETECTED"
+    );
+
+    console.log(
+        "Username:",
+        username
+    );
+
+    console.log(
+        "Reward:",
+        reward
+    );
+
+    console.log(
+        "Supabase ready:",
+        supabaseReady
+    );
+
+    console.log(
+        "================================="
+    );
+
 
     let attempts = 0;
 
-    while (!supabaseReady && attempts < 30) {
+    while (
+        !supabaseReady &&
+        attempts < 50
+    ) {
+
         await wait(100);
+
         attempts++;
     }
 
-    if (!supabaseReady || !supabaseClient) {
+
+    if (
+        !supabaseReady ||
+        !supabaseClient
+    ) {
 
         console.error(
-            "Supabase is not ready. Chess win was not saved."
+            "SUPABASE IS NOT READY"
         );
 
-        chessWinSaved = false;
         return;
     }
 
+
     try {
 
-        /* Find the player */
+        /* =========================================
+           FIND PLAYER
+        ========================================= */
+
         const {
             data: existingPlayer,
             error: selectError
@@ -172,23 +184,28 @@ async function saveChessWin() {
             )
             .maybeSingle();
 
+
         if (selectError) {
 
             console.error(
-                "Could not find player stats:",
+                "ERROR FINDING PLAYER:",
                 selectError
             );
 
-            chessWinSaved = false;
             return;
         }
 
 
         /* =========================================
-           PLAYER DOES NOT EXIST
+           CREATE PLAYER IF THEY DON'T EXIST
         ========================================= */
 
         if (!existingPlayer) {
+
+            console.log(
+                "Player does not exist. Creating player..."
+            );
+
 
             const {
                 data: newPlayer,
@@ -205,23 +222,23 @@ async function saveChessWin() {
                 .select()
                 .single();
 
+
             if (insertError) {
 
                 console.error(
-                    "Could not create player stats:",
+                    "ERROR CREATING PLAYER:",
                     insertError
                 );
 
-                chessWinSaved = false;
                 return;
             }
 
-            console.log(
-                `Created ${username} with ${reward} Chess win(s).`
-            );
+
+            chessWinSaved = true;
+
 
             console.log(
-                "New player:",
+                "PLAYER CREATED SUCCESSFULLY:",
                 newPlayer
             );
 
@@ -230,77 +247,94 @@ async function saveChessWin() {
 
 
         /* =========================================
-           PLAYER ALREADY EXISTS
+           PLAYER EXISTS
         ========================================= */
+
+        console.log(
+            "Existing player found:",
+            existingPlayer
+        );
+
 
         const currentChessWins =
             Number(
                 existingPlayer.chess_wins || 0
             );
 
-        const currentTotalWins =
-            Number(
-                existingPlayer.total_wins || 0
-            );
+
+     
 
 
         const newChessWins =
             currentChessWins + reward;
 
-        const newTotalWins =
-            currentTotalWins + reward;
 
+      
+
+
+
+        
+
+       
+
+        /* =========================================
+           UPDATE PLAYER
+        ========================================= */
 
         const {
+            data: updatedPlayer,
             error: updateError
         } = await supabaseClient
             .from("player_stats")
             .update({
                 chess_wins: newChessWins,
-                total_wins: newTotalWins
             })
             .eq(
                 "id",
                 existingPlayer.id
-            );
+            )
+            .select()
+            .single();
 
 
         if (updateError) {
 
             console.error(
-                "Could not update chess wins:",
-                updateError
+                "ERROR UPDATING PLAYER:",
+                JSON.stringify(updateError, null, 2)
             );
 
-            chessWinSaved = false;
             return;
         }
 
 
+        chessWinSaved = true;
+
+
         console.log(
-            `Chess win saved! ${username}: +${reward}`
+            "================================="
         );
 
         console.log(
-            `Chess wins: ${newChessWins}`
+            "CHESS WIN SAVED SUCCESSFULLY!"
         );
 
         console.log(
-            `Total wins: ${newTotalWins}`
+            updatedPlayer
+        );
+
+        console.log(
+            "================================="
         );
 
     } catch (error) {
 
         console.error(
-            "Unexpected error saving chess win:",
+            "UNEXPECTED CHESS SAVE ERROR:",
             error
         );
-
-        chessWinSaved = false;
     }
 }
-  
-  
   /* =========================================================
   STATE
   ========================================================= */
@@ -322,6 +356,7 @@ async function saveChessWin() {
   let gameOver = false;
   
   let animationLock = false;
+  let chessWinSaved = false;
   
   let pendingPromotion = null;
   
