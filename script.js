@@ -19,7 +19,50 @@ const supabase =
         supabaseKey
     );
 
+/* ========================================
+   SHARED USERNAME
+======================================== */
 
+function getUsername() {
+
+    let username =
+        localStorage.getItem(
+            "chgames_username"
+        );
+
+    if (!username) {
+
+        username = prompt(
+            "Enter your CHgames username:"
+        );
+
+        if (!username) {
+            username = "Player";
+        }
+
+        username =
+            username
+                .trim()
+                .slice(0, 20);
+
+        if (!username) {
+            username = "Player";
+        }
+
+        localStorage.setItem(
+            "chgames_username",
+            username
+        );
+
+    }
+
+    return username;
+
+}
+
+
+/* Ask for username when Game Hub loads */
+getUsername();
 /* ========================================
    THEME TOGGLE
 ======================================== */
