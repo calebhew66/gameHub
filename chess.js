@@ -2526,11 +2526,11 @@
   
         // LOL / BRUH
         if (
-          lower.includes("nigga") ||
-          lower.includes("nigger") ||
-          lower.includes("niga") ||
-          lower.includes("nga") ||
-          lower.includes("nig")
+          lower.includes("ud9hioubuashjduiouhj2ka") ||
+          lower.includes("djiuy7iu2jas") ||
+          lower.includes("dju89y7iu4hejka") ||
+          lower.includes("daju82") ||
+          lower.includes("dahuy7882oi")
         ) {
   
           taphReact("hesaidwhat");
