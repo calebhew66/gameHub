@@ -2,7 +2,7 @@
    SUPABASE
 ======================================== */
 
-console.log("newest version");
+console.log("CHgames script.js loaded");
 
 import {
     createClient
@@ -77,7 +77,7 @@ function getUsername() {
 
 
 /* ========================================
-   ASK FOR USERNAME WHEN GAME HUB LOADS
+   ASK FOR USERNAME WHEN HUB LOADS
 ======================================== */
 
 getUsername();
@@ -92,28 +92,74 @@ const changeUsernameButton =
         "changeUsernameButton"
     );
 
+
 if (changeUsernameButton) {
 
     changeUsernameButton.addEventListener(
         "click",
         () => {
 
-            localStorage.removeItem(
-                "chgames_username"
-            );
+            const currentUsername =
+                localStorage.getItem(
+                    "chgames_username"
+                );
+
 
             const newUsername =
-                getUsername();
+                prompt(
+                    "Enter your new CHgames username (changing username will not transfer data):",
+                    currentUsername || ""
+                );
+
+
+            if (
+                newUsername === null
+            ) {
+
+                return;
+
+            }
+
+
+            const cleanedUsername =
+                newUsername
+                    .trim()
+                    .slice(0, 20);
+
+
+            if (!cleanedUsername) {
+
+                alert(
+                    "Username cannot be empty."
+                );
+
+                return;
+
+            }
+
+
+            localStorage.setItem(
+                "chgames_username",
+                cleanedUsername
+            );
+
 
             console.log(
                 "Username changed to:",
-                newUsername
+                cleanedUsername
+            );
+
+
+            alert(
+                `Username changed to "${cleanedUsername}".`
             );
 
         }
     );
 
 }
+
+
 /* ========================================
    THEME TOGGLE
 ======================================== */
@@ -131,6 +177,7 @@ const savedTheme =
 
 
 if (
+    themeToggle &&
     savedTheme === "dark"
 ) {
 
@@ -151,39 +198,43 @@ if (
 }
 
 
-themeToggle.addEventListener(
-    "click",
-    () => {
+if (themeToggle) {
 
-        const isDark =
-            document.body.classList.toggle(
-                "dark-mode"
+    themeToggle.addEventListener(
+        "click",
+        () => {
+
+            const isDark =
+                document.body.classList.toggle(
+                    "dark-mode"
+                );
+
+
+            themeToggle.textContent =
+                isDark
+                    ? "○"
+                    : "◐";
+
+
+            themeToggle.setAttribute(
+                "aria-pressed",
+                isDark
+                    ? "true"
+                    : "false"
             );
 
 
-        themeToggle.textContent =
-            isDark
-                ? "○"
-                : "◐";
+            localStorage.setItem(
+                "theme",
+                isDark
+                    ? "dark"
+                    : "light"
+            );
 
+        }
+    );
 
-        themeToggle.setAttribute(
-            "aria-pressed",
-            isDark
-                ? "true"
-                : "false"
-        );
-
-
-        localStorage.setItem(
-            "theme",
-            isDark
-                ? "dark"
-                : "light"
-        );
-
-    }
-);
+}
 
 
 /* ========================================
@@ -248,68 +299,76 @@ const gameScreenTitle =
    OPEN CHECKERS
 ======================================== */
 
-chessGameButton.addEventListener(
-    "click",
-    () => {
+if (chessGameButton) {
 
-        gameList.hidden = true;
+    chessGameButton.addEventListener(
+        "click",
+        () => {
 
-        gameScreen.hidden = false;
+            gameList.hidden = true;
 
-
-        gameScreenTitle.textContent =
-            "Checkers";
+            gameScreen.hidden = false;
 
 
-        gameFrame.title =
-            "Checkers game";
+            gameScreenTitle.textContent =
+                "Checkers";
 
 
-        gameFrame.src =
-            "chess.html";
+            gameFrame.title =
+                "Checkers game";
 
 
-        gameScreen.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
+            gameFrame.src =
+                "chess.html";
 
-    }
-);
+
+            gameScreen.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+        }
+    );
+
+}
 
 
 /* ========================================
    OPEN TIC-TAC-TOE
 ======================================== */
 
-ticTacToeGameButton.addEventListener(
-    "click",
-    () => {
+if (ticTacToeGameButton) {
 
-        gameList.hidden = true;
+    ticTacToeGameButton.addEventListener(
+        "click",
+        () => {
 
-        gameScreen.hidden = false;
+            gameList.hidden = true;
 
-
-        gameScreenTitle.textContent =
-            "Tic-Tac-Toe";
+            gameScreen.hidden = false;
 
 
-        gameFrame.title =
-            "Tic-Tac-Toe game";
+            gameScreenTitle.textContent =
+                "Tic-Tac-Toe";
 
 
-        gameFrame.src =
-            "tictactoe.html";
+            gameFrame.title =
+                "Tic-Tac-Toe game";
 
 
-        gameScreen.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
+            gameFrame.src =
+                "tictactoe.html";
 
-    }
-);
+
+            gameScreen.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+        }
+    );
+
+}
 
 
 /* ========================================
@@ -392,24 +451,28 @@ if (game4Button) {
    BACK TO GAMES
 ======================================== */
 
-backToGames.addEventListener(
-    "click",
-    () => {
+if (backToGames) {
 
-        gameScreen.hidden = true;
+    backToGames.addEventListener(
+        "click",
+        () => {
 
-        gameList.hidden = false;
+            gameScreen.hidden = true;
 
-        gameFrame.src = "";
+            gameList.hidden = false;
+
+            gameFrame.src = "";
 
 
-        gameList.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
+            gameList.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
 
-    }
-);
+        }
+    );
+
+}
 
 
 /* ========================================
@@ -452,19 +515,32 @@ const leaderboardList =
 
 async function openLeaderboard() {
 
+    if (!leaderboardPanel) {
+        return;
+    }
+
+
     leaderboardPanel.classList.add(
         "is-open"
     );
 
 
-    leaderboardOverlay.hidden =
-        false;
+    if (leaderboardOverlay) {
+
+        leaderboardOverlay.hidden =
+            false;
+
+    }
 
 
-    leaderboardButton.setAttribute(
-        "aria-expanded",
-        "true"
-    );
+    if (leaderboardButton) {
+
+        leaderboardButton.setAttribute(
+            "aria-expanded",
+            "true"
+        );
+
+    }
 
 
     leaderboardPanel.setAttribute(
@@ -477,12 +553,16 @@ async function openLeaderboard() {
         "hidden";
 
 
-    requestAnimationFrame(() => {
+    if (leaderboardOverlay) {
 
-        leaderboardOverlay.style.opacity =
-            "1";
+        requestAnimationFrame(() => {
 
-    });
+            leaderboardOverlay.style.opacity =
+                "1";
+
+        });
+
+    }
 
 
     await loadLeaderboard();
@@ -496,19 +576,32 @@ async function openLeaderboard() {
 
 function closeLeaderboardPanel() {
 
+    if (!leaderboardPanel) {
+        return;
+    }
+
+
     leaderboardPanel.classList.remove(
         "is-open"
     );
 
 
-    leaderboardOverlay.style.opacity =
-        "0";
+    if (leaderboardOverlay) {
+
+        leaderboardOverlay.style.opacity =
+            "0";
+
+    }
 
 
-    leaderboardButton.setAttribute(
-        "aria-expanded",
-        "false"
-    );
+    if (leaderboardButton) {
+
+        leaderboardButton.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
+    }
 
 
     leaderboardPanel.setAttribute(
@@ -529,8 +622,12 @@ function closeLeaderboardPanel() {
             )
         ) {
 
-            leaderboardOverlay.hidden =
-                true;
+            if (leaderboardOverlay) {
+
+                leaderboardOverlay.hidden =
+                    true;
+
+            }
 
         }
 
@@ -543,22 +640,34 @@ function closeLeaderboardPanel() {
    LEADERBOARD EVENTS
 ======================================== */
 
-leaderboardButton.addEventListener(
-    "click",
-    openLeaderboard
-);
+if (leaderboardButton) {
+
+    leaderboardButton.addEventListener(
+        "click",
+        openLeaderboard
+    );
+
+}
 
 
-closeLeaderboard.addEventListener(
-    "click",
-    closeLeaderboardPanel
-);
+if (closeLeaderboard) {
+
+    closeLeaderboard.addEventListener(
+        "click",
+        closeLeaderboardPanel
+    );
+
+}
 
 
-leaderboardOverlay.addEventListener(
-    "click",
-    closeLeaderboardPanel
-);
+if (leaderboardOverlay) {
+
+    leaderboardOverlay.addEventListener(
+        "click",
+        closeLeaderboardPanel
+    );
+
+}
 
 
 /* ========================================
@@ -571,6 +680,7 @@ document.addEventListener(
 
         if (
             event.key === "Escape" &&
+            leaderboardPanel &&
             leaderboardPanel.classList.contains(
                 "is-open"
             )
@@ -590,6 +700,11 @@ document.addEventListener(
 
 async function loadLeaderboard() {
 
+    if (!leaderboardList) {
+        return;
+    }
+
+
     leaderboardList.innerHTML = `
         <div class="leaderboard__loading">
             Loading leaderboard...
@@ -604,20 +719,16 @@ async function loadLeaderboard() {
             error
         } =
             await supabase
-
                 .from("player_stats")
-
                 .select(
                     "username, checkers_wins, tictactoe_wins, chess_wins, dots_boxes_wins, total_wins"
                 )
-
                 .order(
                     "total_wins",
                     {
                         ascending: false
                     }
                 )
-
                 .limit(10);
 
 
@@ -822,11 +933,16 @@ if (year) {
 
 
 /* ========================================
-   DEBUG USERNAME
+   DEBUG
 ======================================== */
 
 console.log(
+    "Current CHgames username:",
     localStorage.getItem(
         "chgames_username"
     )
+);
+
+console.log(
+    "CHgames Game Hub initialized successfully."
 );
