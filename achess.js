@@ -3711,8 +3711,8 @@
   
               addTaphMessage(
                   playerColor === "white"
-                      ? "White goes first."
-                      : "You're Black. Good luck 😈"
+                      ? "😈"
+                      : "😈"
               );
   
           },

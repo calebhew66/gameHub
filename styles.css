@@ -21,6 +21,15 @@ VARIABLES
   --border: #dddddd;
   --strong-border: #111111;
 
+  /* Background */
+  --bg-main: #ffffff;
+  --bg-secondary: #e9e9e9;
+
+  --circle-1: rgba(0, 0, 0, 0.055);
+  --circle-2: rgba(0, 0, 0, 0.08);
+  --circle-3: rgba(0, 0, 0, 0.035);
+  --circle-4: rgba(0, 0, 0, 0.065);
+
   --max-width: 1100px;
 }
 
@@ -36,6 +45,15 @@ body.dark-mode {
   --muted: #999999;
   --border: #333333;
   --strong-border: #ffffff;
+
+  /* Dark background */
+  --bg-main: #080808;
+  --bg-secondary: #171717;
+
+  --circle-1: rgba(255, 255, 255, 0.045);
+  --circle-2: rgba(255, 255, 255, 0.07);
+  --circle-3: rgba(255, 255, 255, 0.03);
+  --circle-4: rgba(255, 255, 255, 0.055);
 }
 
 
@@ -50,7 +68,209 @@ html {
 body {
   min-height: 100vh;
 
-  background: var(--background);
+  background-color: var(--bg-main);
+
+  /*
+    Lots of circles.
+    These are layered over a simple gradient.
+  */
+  background-image:
+
+    /* TOP LEFT */
+    radial-gradient(
+      circle at 5% 8%,
+      var(--circle-1) 0,
+      var(--circle-1) 90px,
+      transparent 91px
+    ),
+
+    radial-gradient(
+      circle at 18% 18%,
+      var(--circle-3) 0,
+      var(--circle-3) 150px,
+      transparent 151px
+    ),
+
+    /* TOP CENTER */
+    radial-gradient(
+      circle at 38% 5%,
+      var(--circle-2) 0,
+      var(--circle-2) 55px,
+      transparent 56px
+    ),
+
+    radial-gradient(
+      circle at 55% 15%,
+      var(--circle-1) 0,
+      var(--circle-1) 120px,
+      transparent 121px
+    ),
+
+    /* TOP RIGHT */
+    radial-gradient(
+      circle at 78% 7%,
+      var(--circle-4) 0,
+      var(--circle-4) 85px,
+      transparent 86px
+    ),
+
+    radial-gradient(
+      circle at 96% 20%,
+      var(--circle-2) 0,
+      var(--circle-2) 145px,
+      transparent 146px
+    ),
+
+    /* MIDDLE LEFT */
+    radial-gradient(
+      circle at 2% 38%,
+      var(--circle-2) 0,
+      var(--circle-2) 130px,
+      transparent 131px
+    ),
+
+    radial-gradient(
+      circle at 20% 45%,
+      var(--circle-4) 0,
+      var(--circle-4) 70px,
+      transparent 71px
+    ),
+
+    radial-gradient(
+      circle at 34% 35%,
+      var(--circle-1) 0,
+      var(--circle-1) 180px,
+      transparent 181px
+    ),
+
+    /* MIDDLE */
+    radial-gradient(
+      circle at 50% 48%,
+      var(--circle-3) 0,
+      var(--circle-3) 90px,
+      transparent 91px
+    ),
+
+    radial-gradient(
+      circle at 65% 35%,
+      var(--circle-2) 0,
+      var(--circle-2) 135px,
+      transparent 136px
+    ),
+
+    radial-gradient(
+      circle at 82% 43%,
+      var(--circle-1) 0,
+      var(--circle-1) 75px,
+      transparent 76px
+    ),
+
+    radial-gradient(
+      circle at 98% 50%,
+      var(--circle-4) 0,
+      var(--circle-4) 170px,
+      transparent 171px
+    ),
+
+    /* LOWER LEFT */
+    radial-gradient(
+      circle at 8% 65%,
+      var(--circle-3) 0,
+      var(--circle-3) 160px,
+      transparent 161px
+    ),
+
+    radial-gradient(
+      circle at 27% 72%,
+      var(--circle-2) 0,
+      var(--circle-2) 80px,
+      transparent 81px
+    ),
+
+    radial-gradient(
+      circle at 42% 65%,
+      var(--circle-4) 0,
+      var(--circle-4) 125px,
+      transparent 126px
+    ),
+
+    /* LOWER RIGHT */
+    radial-gradient(
+      circle at 60% 78%,
+      var(--circle-1) 0,
+      var(--circle-1) 180px,
+      transparent 181px
+    ),
+
+    radial-gradient(
+      circle at 77% 68%,
+      var(--circle-3) 0,
+      var(--circle-3) 65px,
+      transparent 66px
+    ),
+
+    radial-gradient(
+      circle at 91% 78%,
+      var(--circle-2) 0,
+      var(--circle-2) 140px,
+      transparent 141px
+    ),
+
+    /* BOTTOM */
+    radial-gradient(
+      circle at 15% 94%,
+      var(--circle-1) 0,
+      var(--circle-1) 100px,
+      transparent 101px
+    ),
+
+    radial-gradient(
+      circle at 38% 88%,
+      var(--circle-4) 0,
+      var(--circle-4) 150px,
+      transparent 151px
+    ),
+
+    radial-gradient(
+      circle at 55% 96%,
+      var(--circle-2) 0,
+      var(--circle-2) 70px,
+      transparent 71px
+    ),
+
+    radial-gradient(
+      circle at 72% 91%,
+      var(--circle-1) 0,
+      var(--circle-1) 110px,
+      transparent 111px
+    ),
+
+    radial-gradient(
+      circle at 97% 95%,
+      var(--circle-3) 0,
+      var(--circle-3) 180px,
+      transparent 181px
+    ),
+
+    /* BASE */
+    linear-gradient(
+      135deg,
+      var(--bg-main),
+      var(--bg-secondary)
+    );
+
+  /*
+    IMPORTANT:
+    The background stays fixed while
+    the page content scrolls.
+
+    This creates the slower-moving
+    background effect you wanted.
+  */
+  background-attachment: fixed;
+
+  background-size: auto;
+
   color: var(--text);
 
   font-family:
@@ -66,6 +286,7 @@ body {
     background-color 0.3s ease,
     color 0.3s ease;
 }
+
 
 a {
   color: inherit;
@@ -94,7 +315,13 @@ HEADER
 
   border-bottom: 1px solid var(--border);
 
-  background: var(--background);
+  background: color-mix(
+    in srgb,
+    var(--background) 90%,
+    transparent
+  );
+
+  backdrop-filter: blur(12px);
 }
 
 .nav {
@@ -282,11 +509,14 @@ THEME TOGGLE
 
   transition:
     background-color 0.2s ease,
-    border-color 0.2s ease;
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .nav__theme-toggle:hover {
   border-color: var(--text);
+
+  transform: rotate(8deg);
 }
 
 
@@ -668,12 +898,15 @@ BUTTON
 
   transition:
     background-color 0.2s ease,
-    color 0.2s ease;
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .btn:hover {
   background: var(--text);
   color: var(--background);
+
+  transform: translateY(-2px);
 }
 
 
@@ -808,7 +1041,8 @@ GAME CARD
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease,
-    transform 0.2s ease;
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .game-card:hover {
@@ -816,7 +1050,15 @@ GAME CARD
 
   background: var(--background);
 
-  transform: translateY(-3px);
+  transform: translateY(-5px);
+
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+body.dark-mode .game-card:hover {
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.4);
 }
 
 .game-card:active {

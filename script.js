@@ -29,29 +29,37 @@ const supabase =
 ======================================== */
 
 function getUsername() {
+
     let username =
         localStorage.getItem(
             "chgames_username"
         );
+
     if (!username) {
+
         username = prompt(
             "Enter your CHgames username:"
         );
+
         if (!username) {
             username = "Player";
         }
+
         username =
             username
                 .trim()
                 .slice(0, 20);
+
         if (!username) {
             username = "Player";
         }
+
         localStorage.setItem(
             "chgames_username",
             username
         );
     }
+
     return username;
 }
 
