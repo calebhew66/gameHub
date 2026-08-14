@@ -1,3 +1,4 @@
+
 /* ========================================
 RESET
 ======================================== */
@@ -23,12 +24,12 @@ VARIABLES
 
   /* Background */
   --bg-main: #ffffff;
-  --bg-secondary: #e9e9e9;
+  --bg-secondary: #eeeeee;
 
-  --circle-1: rgba(0, 0, 0, 0.055);
-  --circle-2: rgba(0, 0, 0, 0.08);
-  --circle-3: rgba(0, 0, 0, 0.035);
-  --circle-4: rgba(0, 0, 0, 0.065);
+  /* Stronger circles */
+  --bg-circle-1: rgba(0, 0, 0, 0.12);
+  --bg-circle-2: rgba(0, 0, 0, 0.08);
+  --bg-circle-3: rgba(0, 0, 0, 0.055);
 
   --max-width: 1100px;
 }
@@ -46,14 +47,13 @@ body.dark-mode {
   --border: #333333;
   --strong-border: #ffffff;
 
-  /* Dark background */
   --bg-main: #080808;
-  --bg-secondary: #171717;
+  --bg-secondary: #181818;
 
-  --circle-1: rgba(255, 255, 255, 0.045);
-  --circle-2: rgba(255, 255, 255, 0.07);
-  --circle-3: rgba(255, 255, 255, 0.03);
-  --circle-4: rgba(255, 255, 255, 0.055);
+  /* Stronger dark circles */
+  --bg-circle-1: rgba(255, 255, 255, 0.10);
+  --bg-circle-2: rgba(255, 255, 255, 0.07);
+  --bg-circle-3: rgba(255, 255, 255, 0.045);
 }
 
 
@@ -68,208 +68,105 @@ html {
 body {
   min-height: 100vh;
 
-  background-color: var(--bg-main);
-
-  /*
-    Lots of circles.
-    These are layered over a simple gradient.
-  */
-  background-image:
-
-    /* TOP LEFT */
+  background:
+    /* Random-looking large circles */
     radial-gradient(
-      circle at 5% 8%,
-      var(--circle-1) 0,
-      var(--circle-1) 90px,
-      transparent 91px
-    ),
-
-    radial-gradient(
-      circle at 18% 18%,
-      var(--circle-3) 0,
-      var(--circle-3) 150px,
-      transparent 151px
-    ),
-
-    /* TOP CENTER */
-    radial-gradient(
-      circle at 38% 5%,
-      var(--circle-2) 0,
-      var(--circle-2) 55px,
-      transparent 56px
-    ),
-
-    radial-gradient(
-      circle at 55% 15%,
-      var(--circle-1) 0,
-      var(--circle-1) 120px,
-      transparent 121px
-    ),
-
-    /* TOP RIGHT */
-    radial-gradient(
-      circle at 78% 7%,
-      var(--circle-4) 0,
-      var(--circle-4) 85px,
+      circle at 8% 12%,
+      var(--bg-circle-1) 0,
+      var(--bg-circle-1) 85px,
       transparent 86px
     ),
 
     radial-gradient(
-      circle at 96% 20%,
-      var(--circle-2) 0,
-      var(--circle-2) 145px,
-      transparent 146px
-    ),
-
-    /* MIDDLE LEFT */
-    radial-gradient(
-      circle at 2% 38%,
-      var(--circle-2) 0,
-      var(--circle-2) 130px,
-      transparent 131px
+      circle at 25% 32%,
+      var(--bg-circle-2) 0,
+      var(--bg-circle-2) 120px,
+      transparent 121px
     ),
 
     radial-gradient(
-      circle at 20% 45%,
-      var(--circle-4) 0,
-      var(--circle-4) 70px,
+      circle at 47% 15%,
+      var(--bg-circle-3) 0,
+      var(--bg-circle-3) 70px,
       transparent 71px
     ),
 
     radial-gradient(
-      circle at 34% 35%,
-      var(--circle-1) 0,
-      var(--circle-1) 180px,
-      transparent 181px
+      circle at 72% 24%,
+      var(--bg-circle-1) 0,
+      var(--bg-circle-1) 145px,
+      transparent 146px
     ),
 
-    /* MIDDLE */
     radial-gradient(
-      circle at 50% 48%,
-      var(--circle-3) 0,
-      var(--circle-3) 90px,
+      circle at 92% 10%,
+      var(--bg-circle-2) 0,
+      var(--bg-circle-2) 90px,
       transparent 91px
     ),
 
     radial-gradient(
-      circle at 65% 35%,
-      var(--circle-2) 0,
-      var(--circle-2) 135px,
-      transparent 136px
-    ),
-
-    radial-gradient(
-      circle at 82% 43%,
-      var(--circle-1) 0,
-      var(--circle-1) 75px,
-      transparent 76px
-    ),
-
-    radial-gradient(
-      circle at 98% 50%,
-      var(--circle-4) 0,
-      var(--circle-4) 170px,
-      transparent 171px
-    ),
-
-    /* LOWER LEFT */
-    radial-gradient(
-      circle at 8% 65%,
-      var(--circle-3) 0,
-      var(--circle-3) 160px,
-      transparent 161px
-    ),
-
-    radial-gradient(
-      circle at 27% 72%,
-      var(--circle-2) 0,
-      var(--circle-2) 80px,
-      transparent 81px
-    ),
-
-    radial-gradient(
-      circle at 42% 65%,
-      var(--circle-4) 0,
-      var(--circle-4) 125px,
-      transparent 126px
-    ),
-
-    /* LOWER RIGHT */
-    radial-gradient(
-      circle at 60% 78%,
-      var(--circle-1) 0,
-      var(--circle-1) 180px,
-      transparent 181px
-    ),
-
-    radial-gradient(
-      circle at 77% 68%,
-      var(--circle-3) 0,
-      var(--circle-3) 65px,
-      transparent 66px
-    ),
-
-    radial-gradient(
-      circle at 91% 78%,
-      var(--circle-2) 0,
-      var(--circle-2) 140px,
-      transparent 141px
-    ),
-
-    /* BOTTOM */
-    radial-gradient(
-      circle at 15% 94%,
-      var(--circle-1) 0,
-      var(--circle-1) 100px,
-      transparent 101px
-    ),
-
-    radial-gradient(
-      circle at 38% 88%,
-      var(--circle-4) 0,
-      var(--circle-4) 150px,
+      circle at 15% 55%,
+      var(--bg-circle-2) 0,
+      var(--bg-circle-2) 150px,
       transparent 151px
     ),
 
     radial-gradient(
-      circle at 55% 96%,
-      var(--circle-2) 0,
-      var(--circle-2) 70px,
-      transparent 71px
-    ),
-
-    radial-gradient(
-      circle at 72% 91%,
-      var(--circle-1) 0,
-      var(--circle-1) 110px,
+      circle at 40% 68%,
+      var(--bg-circle-1) 0,
+      var(--bg-circle-1) 110px,
       transparent 111px
     ),
 
     radial-gradient(
-      circle at 97% 95%,
-      var(--circle-3) 0,
-      var(--circle-3) 180px,
+      circle at 67% 55%,
+      var(--bg-circle-3) 0,
+      var(--bg-circle-3) 180px,
       transparent 181px
     ),
 
-    /* BASE */
+    radial-gradient(
+      circle at 88% 72%,
+      var(--bg-circle-1) 0,
+      var(--bg-circle-1) 125px,
+      transparent 126px
+    ),
+
+    radial-gradient(
+      circle at 5% 90%,
+      var(--bg-circle-3) 0,
+      var(--bg-circle-3) 100px,
+      transparent 101px
+    ),
+
+    radial-gradient(
+      circle at 32% 92%,
+      var(--bg-circle-2) 0,
+      var(--bg-circle-2) 140px,
+      transparent 141px
+    ),
+
+    radial-gradient(
+      circle at 60% 88%,
+      var(--bg-circle-1) 0,
+      var(--bg-circle-1) 95px,
+      transparent 96px
+    ),
+
+    radial-gradient(
+      circle at 95% 94%,
+      var(--bg-circle-2) 0,
+      var(--bg-circle-2) 160px,
+      transparent 161px
+    ),
+
+    /* Main background */
     linear-gradient(
       135deg,
       var(--bg-main),
       var(--bg-secondary)
     );
-
-  /*
-    IMPORTANT:
-    The background stays fixed while
-    the page content scrolls.
-
-    This creates the slower-moving
-    background effect you wanted.
-  */
-  background-attachment: fixed;
-
-  background-size: auto;
 
   color: var(--text);
 
@@ -286,7 +183,6 @@ body {
     background-color 0.3s ease,
     color 0.3s ease;
 }
-
 
 a {
   color: inherit;
@@ -423,9 +319,7 @@ CHANGE USERNAME
 
 .nav__username-button:focus-visible {
   outline: 2px solid var(--text);
-
   outline-offset: 4px;
-
   border-radius: 2px;
 }
 
@@ -1374,40 +1268,4 @@ SMALL MOBILE
   }
 
 }
-
-.background-circles {
-  position: fixed;
-  inset: 0;
-
-  width: 100%;
-  height: 100%;
-
-  overflow: hidden;
-
-  pointer-events: none;
-
-  z-index: 0;
-}
-
-.background-circle {
-  position: absolute;
-
-  border-radius: 50%;
-
-  background: var(--bg-circle);
-
-  opacity: 0.8;
-
-  pointer-events: none;
-}
-
-/* Keep all actual website content above the circles */
-
-.site-header,
-main,
-.site-footer {
-  position: relative;
-  z-index: 1;
-}
-
 

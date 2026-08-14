@@ -25,6 +25,135 @@ const supabase =
 
 
 /* ========================================
+   RANDOM BACKGROUND CIRCLES
+======================================== */
+
+function generateRandomBackground() {
+
+    const circles = [];
+
+    const usedPositions = new Set();
+
+    const circleCount = 30;
+
+
+    while (
+        circles.length < circleCount
+    ) {
+
+        /*
+         * Generate whole-number positions.
+         *
+         * Using whole numbers makes it easy
+         * to guarantee that positions don't
+         * repeat.
+         */
+
+        const x =
+            Math.floor(
+                Math.random() * 101
+            );
+
+        const y =
+            Math.floor(
+                Math.random() * 101
+            );
+
+
+        const positionKey =
+            `${x}-${y}`;
+
+
+        /*
+         * Don't allow the exact same
+         * position twice.
+         */
+
+        if (
+            usedPositions.has(
+                positionKey
+            )
+        ) {
+
+            continue;
+
+        }
+
+
+        usedPositions.add(
+            positionKey
+        );
+
+
+        /*
+         * Random circle size.
+         */
+
+        const size =
+            Math.floor(
+                Math.random() * 180
+            ) + 60;
+
+
+        /*
+         * Random strength.
+         *
+         * Uses the CSS text color so the
+         * circles automatically work in
+         * both light and dark mode.
+         */
+
+        const strength =
+            Math.floor(
+                Math.random() * 8
+            ) + 6;
+
+
+        const circle =
+            `radial-gradient(
+                circle at ${x}% ${y}%,
+                color-mix(
+                    in srgb,
+                    var(--text) ${strength}%,
+                    transparent
+                ) 0,
+                color-mix(
+                    in srgb,
+                    var(--text) ${strength}%,
+                    transparent
+                ) ${size}px,
+                transparent ${size + 1}px
+            )`;
+
+
+        circles.push(
+            circle
+        );
+
+    }
+
+
+    /*
+     * Put all of the generated circles
+     * into the CSS custom property.
+     */
+
+    document.body.style.setProperty(
+        "--random-circles",
+        circles.join(",")
+    );
+
+}
+
+
+/* ========================================
+   GENERATE CIRCLES ON PAGE LOAD
+======================================== */
+
+generateRandomBackground();
+
+
+/* ========================================
    SHARED USERNAME
 ======================================== */
 
@@ -35,32 +164,47 @@ function getUsername() {
             "chgames_username"
         );
 
+
     if (!username) {
 
-        username = prompt(
-            "Enter your CHgames username:"
-        );
+        username =
+            prompt(
+                "Enter your CHgames username:"
+            );
+
 
         if (!username) {
-            username = "Player";
+
+            username =
+                "Player";
+
         }
+
 
         username =
             username
                 .trim()
                 .slice(0, 20);
 
+
         if (!username) {
-            username = "Player";
+
+            username =
+                "Player";
+
         }
+
 
         localStorage.setItem(
             "chgames_username",
             username
         );
+
     }
 
+
     return username;
+
 }
 
 
@@ -293,9 +437,12 @@ if (chessGameButton) {
         "click",
         () => {
 
-            gameList.hidden = true;
+            gameList.hidden =
+                true;
 
-            gameScreen.hidden = false;
+
+            gameScreen.hidden =
+                false;
 
 
             gameScreenTitle.textContent =
@@ -331,9 +478,12 @@ if (ticTacToeGameButton) {
         "click",
         () => {
 
-            gameList.hidden = true;
+            gameList.hidden =
+                true;
 
-            gameScreen.hidden = false;
+
+            gameScreen.hidden =
+                false;
 
 
             gameScreenTitle.textContent =
@@ -369,9 +519,12 @@ if (chessGame3Button) {
         "click",
         () => {
 
-            gameList.hidden = true;
+            gameList.hidden =
+                true;
 
-            gameScreen.hidden = false;
+
+            gameScreen.hidden =
+                false;
 
 
             gameScreenTitle.textContent =
@@ -407,9 +560,12 @@ if (game4Button) {
         "click",
         () => {
 
-            gameList.hidden = true;
+            gameList.hidden =
+                true;
 
-            gameScreen.hidden = false;
+
+            gameScreen.hidden =
+                false;
 
 
             gameScreenTitle.textContent =
@@ -445,11 +601,16 @@ if (backToGames) {
         "click",
         () => {
 
-            gameScreen.hidden = true;
+            gameScreen.hidden =
+                true;
 
-            gameList.hidden = false;
 
-            gameFrame.src = "";
+            gameList.hidden =
+                false;
+
+
+            gameFrame.src =
+                "";
 
 
             gameList.scrollIntoView({
@@ -504,7 +665,9 @@ const leaderboardList =
 async function openLeaderboard() {
 
     if (!leaderboardPanel) {
+
         return;
+
     }
 
 
@@ -565,7 +728,9 @@ async function openLeaderboard() {
 function closeLeaderboardPanel() {
 
     if (!leaderboardPanel) {
+
         return;
+
     }
 
 
@@ -689,7 +854,9 @@ document.addEventListener(
 async function loadLeaderboard() {
 
     if (!leaderboardList) {
+
         return;
+
     }
 
 
@@ -930,6 +1097,7 @@ console.log(
         "chgames_username"
     )
 );
+
 
 console.log(
     "CHgames Game Hub initialized successfully."

@@ -23,19 +23,7 @@
   />
 </head>
 
-
 <body>
-
-  <!-- ========================================
-       RANDOM BACKGROUND CIRCLES
-  ========================================= -->
-
-  <div
-    id="backgroundCircles"
-    class="background-circles"
-    aria-hidden="true"
-  ></div>
-
 
   <!-- ========================================
        HEADER / NAVIGATION
@@ -48,8 +36,6 @@
       aria-label="Main navigation"
     >
 
-      <!-- LOGO -->
-
       <a
         href="#top"
         class="nav__logo"
@@ -58,15 +44,9 @@
         CHgames
       </a>
 
-
-      <!-- NAVIGATION LINKS -->
-
       <ul class="nav__links">
 
-        <!-- CHANGE USERNAME -->
-
         <li>
-
           <button
             id="changeUsernameButton"
             class="nav__username-button"
@@ -74,25 +54,15 @@
           >
             Change Username
           </button>
-
         </li>
 
-
-        <!-- ARCADE -->
-
         <li>
-
           <a href="#arcade">
             Arcade
           </a>
-
         </li>
 
-
-        <!-- LEADERBOARD -->
-
         <li>
-
           <button
             id="leaderboardButton"
             class="nav__leaderboard-button"
@@ -102,13 +72,9 @@
           >
             Leaderboard
           </button>
-
         </li>
 
       </ul>
-
-
-      <!-- THEME TOGGLE -->
 
       <button
         id="themeToggle"
@@ -125,7 +91,6 @@
   </header>
 
 
-
   <!-- ========================================
        LEADERBOARD OVERLAY
   ========================================= -->
@@ -135,7 +100,6 @@
     class="leaderboard-overlay"
     hidden
   ></div>
-
 
 
   <!-- ========================================
@@ -148,8 +112,6 @@
     aria-label="Leaderboard"
     aria-hidden="true"
   >
-
-    <!-- HEADER -->
 
     <div class="leaderboard-panel__header">
 
@@ -165,7 +127,6 @@
 
       </div>
 
-
       <button
         id="closeLeaderboard"
         class="leaderboard-panel__close"
@@ -178,9 +139,6 @@
     </div>
 
 
-
-    <!-- DESCRIPTION -->
-
     <div class="leaderboard-panel__description">
 
       <p>
@@ -189,9 +147,6 @@
 
     </div>
 
-
-
-    <!-- COLUMNS -->
 
     <div class="leaderboard-panel__columns">
 
@@ -206,9 +161,6 @@
     </div>
 
 
-
-    <!-- PLAYER LIST -->
-
     <div
       id="leaderboardList"
       class="leaderboard-panel__list"
@@ -221,7 +173,6 @@
     </div>
 
   </aside>
-
 
 
   <!-- ========================================
@@ -246,7 +197,6 @@
           Game Hub
         </p>
 
-
         <h1
           id="hero-title"
           class="hero__name"
@@ -256,11 +206,9 @@
           Have Fun.
         </h1>
 
-
         <p class="hero__tagline">
           A collection of games you can play right in your browser.
         </p>
-
 
         <div class="hero__actions">
 
@@ -278,7 +226,6 @@
     </section>
 
 
-
     <!-- ========================================
          GAMES
     ========================================= -->
@@ -288,8 +235,6 @@
       class="section"
       aria-labelledby="games-title"
     >
-
-      <!-- SECTION HEADER -->
 
       <header class="section__header">
 
@@ -307,24 +252,17 @@
       </header>
 
 
-
       <!-- ========================================
            GAME LIST
       ========================================= -->
 
       <div id="gameList">
 
-        <!-- ========================================
-             ARCADE
-        ========================================= -->
-
         <section
           id="arcade"
           class="game-category"
           aria-labelledby="arcade-title"
         >
-
-          <!-- CATEGORY HEADER -->
 
           <header class="category__header">
 
@@ -338,11 +276,6 @@
 
           </header>
 
-
-
-          <!-- ========================================
-               GAME GRID
-          ========================================= -->
 
           <div class="game-grid">
 
@@ -358,7 +291,6 @@
                 01
               </span>
 
-
               <div>
 
                 <h4>
@@ -371,7 +303,6 @@
 
               </div>
 
-
               <span
                 class="game-card__arrow"
                 aria-hidden="true"
@@ -380,7 +311,6 @@
               </span>
 
             </button>
-
 
 
             <!-- TIC-TAC-TOE -->
@@ -395,7 +325,6 @@
                 02
               </span>
 
-
               <div>
 
                 <h4>
@@ -408,7 +337,6 @@
 
               </div>
 
-
               <span
                 class="game-card__arrow"
                 aria-hidden="true"
@@ -417,7 +345,6 @@
               </span>
 
             </button>
-
 
 
             <!-- CHESS -->
@@ -432,7 +359,6 @@
                 03
               </span>
 
-
               <div>
 
                 <h4>
@@ -445,7 +371,6 @@
 
               </div>
 
-
               <span
                 class="game-card__arrow"
                 aria-hidden="true"
@@ -454,7 +379,6 @@
               </span>
 
             </button>
-
 
 
             <!-- DOTS & BOXES -->
@@ -469,7 +393,6 @@
                 04
               </span>
 
-
               <div>
 
                 <h4>
@@ -481,7 +404,6 @@
                 </p>
 
               </div>
-
 
               <span
                 class="game-card__arrow"
@@ -499,7 +421,6 @@
       </div>
 
 
-
       <!-- ========================================
            GAME SCREEN
       ========================================= -->
@@ -511,8 +432,6 @@
         hidden
       >
 
-        <!-- BACK BUTTON -->
-
         <button
           id="backToGames"
           class="back-button"
@@ -522,15 +441,11 @@
         </button>
 
 
-
-        <!-- GAME HEADER -->
-
         <header class="game-screen__header">
 
           <p class="section__eyebrow">
             Now playing
           </p>
-
 
           <h2
             id="gameScreenTitle"
@@ -541,9 +456,6 @@
 
         </header>
 
-
-
-        <!-- GAME -->
 
         <div class="game-container">
 
@@ -563,7 +475,6 @@
   </main>
 
 
-
   <!-- ========================================
        FOOTER
   ========================================= -->
@@ -571,85 +482,16 @@
   <footer class="site-footer">
 
     <p>
-
       &copy;
-
       <span id="year"></span>
-
       CHgames Game Hub.
-
     </p>
 
   </footer>
 
 
-
   <!-- ========================================
-       RANDOM CIRCLE GENERATOR
-  ========================================= -->
-
-  <script>
-    (function () {
-
-      const container =
-        document.getElementById("backgroundCircles");
-
-      if (!container) {
-        return;
-      }
-
-      const circleCount = 35;
-
-      for (let i = 0; i < circleCount; i++) {
-
-        const circle =
-          document.createElement("span");
-
-        circle.className =
-          "background-circle";
-
-        const size =
-          Math.floor(
-            Math.random() * 220
-          ) + 40;
-
-        const left =
-          Math.random() * 100;
-
-        const top =
-          Math.random() * 100;
-
-        const rotation =
-          Math.random() * 360;
-
-        circle.style.width =
-          `${size}px`;
-
-        circle.style.height =
-          `${size}px`;
-
-        circle.style.left =
-          `${left}%`;
-
-        circle.style.top =
-          `${top}%`;
-
-        circle.style.transform =
-          `translate(-50%, -50%) rotate(${rotation}deg)`;
-
-        circle.style.animationDelay =
-          `${Math.random() * -10}s`;
-
-        container.appendChild(circle);
-
-      }
-
-    })();
-  </script>
-
-
-  <!-- ========================================
-       MAIN JAVASCRIPT
+       JAVASCRIPT
   ========================================= -->
 
   <script
@@ -657,10 +499,6 @@
     src="script.js"
   ></script>
 
-
 </body>
 
 </html>
-
-
-
