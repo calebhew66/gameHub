@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -24,6 +25,16 @@
 
 
 <body>
+
+  <!-- ========================================
+       RANDOM BACKGROUND CIRCLES
+  ========================================= -->
+
+  <div
+    id="backgroundCircles"
+    class="background-circles"
+    aria-hidden="true"
+  ></div>
 
 
   <!-- ========================================
@@ -219,7 +230,6 @@
 
   <main>
 
-
     <!-- ========================================
          HERO
     ========================================= -->
@@ -279,7 +289,6 @@
       aria-labelledby="games-title"
     >
 
-
       <!-- SECTION HEADER -->
 
       <header class="section__header">
@@ -305,7 +314,6 @@
 
       <div id="gameList">
 
-
         <!-- ========================================
              ARCADE
         ========================================= -->
@@ -315,7 +323,6 @@
           class="game-category"
           aria-labelledby="arcade-title"
         >
-
 
           <!-- CATEGORY HEADER -->
 
@@ -338,7 +345,6 @@
           ========================================= -->
 
           <div class="game-grid">
-
 
             <!-- CHECKERS -->
 
@@ -486,7 +492,6 @@
 
             </button>
 
-
           </div>
 
         </section>
@@ -505,7 +510,6 @@
         aria-labelledby="gameScreenTitle"
         hidden
       >
-
 
         <!-- BACK BUTTON -->
 
@@ -552,9 +556,7 @@
 
         </div>
 
-
       </section>
-
 
     </section>
 
@@ -583,7 +585,71 @@
 
 
   <!-- ========================================
-       JAVASCRIPT
+       RANDOM CIRCLE GENERATOR
+  ========================================= -->
+
+  <script>
+    (function () {
+
+      const container =
+        document.getElementById("backgroundCircles");
+
+      if (!container) {
+        return;
+      }
+
+      const circleCount = 35;
+
+      for (let i = 0; i < circleCount; i++) {
+
+        const circle =
+          document.createElement("span");
+
+        circle.className =
+          "background-circle";
+
+        const size =
+          Math.floor(
+            Math.random() * 220
+          ) + 40;
+
+        const left =
+          Math.random() * 100;
+
+        const top =
+          Math.random() * 100;
+
+        const rotation =
+          Math.random() * 360;
+
+        circle.style.width =
+          `${size}px`;
+
+        circle.style.height =
+          `${size}px`;
+
+        circle.style.left =
+          `${left}%`;
+
+        circle.style.top =
+          `${top}%`;
+
+        circle.style.transform =
+          `translate(-50%, -50%) rotate(${rotation}deg)`;
+
+        circle.style.animationDelay =
+          `${Math.random() * -10}s`;
+
+        container.appendChild(circle);
+
+      }
+
+    })();
+  </script>
+
+
+  <!-- ========================================
+       MAIN JAVASCRIPT
   ========================================= -->
 
   <script
@@ -595,3 +661,6 @@
 </body>
 
 </html>
+
+
+
