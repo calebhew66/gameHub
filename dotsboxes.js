@@ -87,7 +87,7 @@
 
   let currentPlayer = "player";
 
-  let playerColor = "blue";
+  let playerColor = "green";
 
   let botColor = "red";
 
